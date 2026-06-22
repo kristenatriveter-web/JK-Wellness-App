@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JK Wellness</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #FAF8F4;
+    --surface: #FFFFFF;
+    --surface2: #F2EFE9;
+    --border: #E4DDD3;
+    --text: #2C2720;
+    --text-muted: #8C8178;
+    --text-dim: #B8B0A7;
+    --accent: #8B7355;
+    --accent-light: #C4A882;
+    --accent-dim: rgba(139, 115, 85, 0.08);
+    --accent-border: rgba(139, 115, 85, 0.22);
+    --morning: #A0794A;
+    --morning-dim: rgba(160, 121, 74, 0.08);
+    --evening: #6B7FA3;
+    --evening-dim: rgba(107, 127, 163, 0.08);
+    --radius: 12px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    padding: 18px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+
+  .logo span {
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .mode-badge {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 4px 11px;
+    border-radius: 20px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .mode-badge.morning {
+    background: var(--morning-dim);
+    color: var(--morning);
+    border: 1px solid rgba(160, 121, 74, 0.25);
+  }
+
+  .mode-badge.evening {
+    background: var(--evening-dim);
+    color: var(--evening);
+    border: 1px solid rgba(107, 127, 163, 0.25);
+  }
+
+  /* Mode selector screen */
+  .mode-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px 24px;
+    gap: 14px;
+  }
+
+  .mode-screen .greeting-block {
+    margin-bottom: 12px;
+  }
+
+  .mode-screen h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .mode-screen h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .mode-screen p {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    margin-bottom: 20px;
+  }
+
+  .mode-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    width: 100%;
+    position: relative;
+  }
+
+  .mode-btn:hover, .mode-btn:active {
+    border-color: var(--accent-border);
+    background: var(--surface);
+    box-shadow: 0 2px 16px rgba(139, 115, 85, 0.1);
+  }
+
+  .mode-btn .btn-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .mode-btn.morning .btn-label { color: var(--morning); }
+  .mode-btn.evening .btn-label { color: var(--evening); }
+
+  .mode-btn .btn-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 3px;
+    letter-spacing: 0.02em;
+  }
+
+  .mode-btn .btn-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-muted);
+  }
+
+  .mode-btn .btn-arrow {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 22px;
+    font-weight: 300;
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .divider span {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Chat screen */
+  .chat-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    display: none;
+  }
+
+  .chat-screen.active {
+    display: flex;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+
+  .message {
+    max-width: 84%;
+    animation: fadeUp 0.2s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.coach { align-self: flex-start; }
+  .message.user { align-self: flex-end; }
+
+  .message-bubble {
+    padding: 13px 17px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    line-height: 1.55;
+    font-weight: 300;
+  }
+
+  .message.coach .message-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 3px;
+    color: var(--text);
+  }
+
+  .message.user .message-bubble {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    border-bottom-right-radius: 3px;
+    color: var(--text);
+  }
+
+  .message-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+    padding: 0 3px;
+  }
+
+  .message.user .message-label { text-align: right; }
+
+  /* Typing indicator */
+  .typing-indicator {
+    align-self: flex-start;
+    display: none;
+  }
+
+  .typing-indicator.visible { display: block; }
+
+  .typing-dots {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    border-bottom-left-radius: 3px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .typing-dots span {
+    width: 5px;
+    height: 5px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  /* Success */
+  .success-bubble {
+    background: var(--surface);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-top: 4px;
+  }
+
+  .success-bubble .check {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .success-bubble p {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .success-bubble strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Input area */
+  .input-area {
+    padding: 12px 16px 28px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .input-wrap {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: flex-end;
+    padding: 11px 15px;
+    transition: border-color 0.2s;
+  }
+
+  .input-wrap:focus-within {
+    border-color: var(--accent-light);
+  }
+
+  textarea {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    resize: none;
+    width: 100%;
+    max-height: 120px;
+    line-height: 1.5;
+    caret-color: var(--accent);
+  }
+
+  textarea::placeholder {
+    color: var(--text-dim);
+  }
+
+  .send-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--accent);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .send-btn:hover { background: var(--accent-light); }
+  .send-btn:disabled { background: var(--border); cursor: not-allowed; }
+
+  .send-btn svg {
+    width: 17px;
+    height: 17px;
+    fill: white;
+  }
+
+  .send-btn:disabled svg { fill: var(--text-dim); }
+
+  /* Date display */
+  .date-display {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 4px 0 8px;
+  }
+
+  /* Date picker */
+  .date-picker-wrap {
+    margin-bottom: 8px;
+  }
+
+  .date-picker-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .date-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .date-display-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .date-display-btn:hover {
+    border-color: var(--accent-border);
+  }
+
+  .date-display-btn .cal-icon {
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+
+  .date-nav {
+    display: flex;
+    gap: 6px;
+  }
+
+  .date-nav-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-family: 'Jost', sans-serif;
+  }
+
+  .date-nav-btn:hover {
+    border-color: var(--accent-border);
+    color: var(--accent);
+  }
+
+  .date-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .date-native-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+  }
+
+  .today-tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-left: 8px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(44, 39, 32, 0.08);
+  }
+
+  .toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success {
+    border-color: var(--accent-border);
+    color: var(--accent);
+  }
+
+  .toast.error {
+    border-color: rgba(180, 80, 80, 0.3);
+    color: #a05050;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <span class="logo">Jillian <span>Keaveny</span></span>
+  <span class="mode-badge morning" id="modeBadge" style="display:none"></span>
+</header>
+
+<!-- Mode selector -->
+<div class="mode-screen" id="modeScreen">
+  <div class="greeting-block">
+    <h1>Good <em id="greeting"></em>,<br>let's check in.</h1>
+  </div>
+
+  <div class="date-picker-wrap">
+    <span class="date-picker-label">Logging for</span>
+    <div class="date-row">
+      <button class="date-display-btn" onclick="openDatePicker()" id="dateDisplayBtn">
+        <span id="dateDisplayText"></span>
+        <span class="cal-icon">📅</span>
+      </button>
+      <input type="date" id="nativeDateInput" class="date-native-input" onchange="onDateChange(this.value)">
+      <div class="date-nav">
+        <button class="date-nav-btn" onclick="shiftDate(-1)" id="prevDayBtn" title="Previous day">‹</button>
+        <button class="date-nav-btn" onclick="shiftDate(1)" id="nextDayBtn" title="Next day">›</button>
+      </div>
+    </div>
+  </div>
+
+  <p style="color:var(--text-muted);font-size:14px;font-weight:300;letter-spacing:0.02em;margin-bottom:4px;">What are you logging?</p>
+
+  <button class="mode-btn morning" onclick="startCheckin('morning')">
+    <div class="btn-label">☀️ Morning</div>
+    <div class="btn-title">Morning Check-In</div>
+    <div class="btn-desc">Weight, sleep &amp; energy</div>
+    <div class="btn-arrow">›</div>
+  </button>
+
+  <div class="divider"><span>or</span></div>
+
+  <button class="mode-btn evening" onclick="startCheckin('evening')">
+    <div class="btn-label">🌙 Evening</div>
+    <div class="btn-title">Evening Check-In</div>
+    <div class="btn-desc">Macros, steps &amp; notes</div>
+    <div class="btn-arrow">›</div>
+  </button>
+</div>
+
+<!-- Chat screen -->
+<div class="chat-screen" id="chatScreen">
+  <div class="messages" id="messages">
+    <div class="date-display" id="dateDisplay"></div>
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+  <div class="input-area">
+    <div class="input-wrap">
+      <textarea
+        id="userInput"
+        placeholder="Type your answer..."
+        rows="1"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"
+      ></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const CONFIG = {
+  SHEET_ID: '1Swtih3BMsxoApMjxiTyX_mV8uHgCxVgyx2PRADkmaUs',
+  CLIENT_NAME: 'Client',
+  API_BASE: '/api/token'  // Vercel serverless function — credentials live there
+};
+
+// Column mapping for Daily Tracker (0-indexed, row has date in col A)
+// A=Date, B=Morning Weight, C=Body Fat%, D=Skeletal Muscle Mass, E=col15,
+// F=Avg Weight, G=Protein, H=Carbs, I=Fats, J=Fiber, K=Calories,
+// L=Steps, M=Cardio, N=Workout Completed, O=Sleep Duration, P=Notes, Q=Recipe/Questions
+const COLUMNS = {
+  date: 0,
+  morningWeight: 1,
+  protein: 6,
+  carbs: 7,
+  fats: 8,
+  fiber: 9,
+  calories: 10,
+  steps: 11,
+  cardio: 12,
+  workoutCompleted: 13,
+  sleepDuration: 14,
+  notes: 15,
+  recipeQuestions: 16,
+  // Extra fields we'll store in notes if no dedicated column
+  bedtime: 'bedtime',
+  sleepQuality: 'sleepQuality',
+  energy: 'energy'
+};
+
+const MORNING_SYSTEM = `You are a warm, encouraging wellness coach assistant for JK Wellness. You are conducting a morning check-in with a client.
+
+Ask these questions ONE AT A TIME, in order. Be conversational and brief. After each answer, acknowledge warmly (1 sentence max) then ask the next question.
+
+Questions to ask:
+1. What time did you go to sleep last night?
+2. What's your weight this morning? (in lbs)
+3. How many hours of sleep did you get?
+4. How would you rate your sleep quality? (1-10, where 1 is awful and 10 is amazing)
+5. How's your energy today? (1-10, where 1 is exhausted and 10 is flying)
+6. Any notes to start the day? (feelings, intentions, questions for your coach — or just say "none")
+
+Once you have all 6 answers, say exactly this and nothing else after it:
+CHECKIN_COMPLETE:{"bedtime":"[answer]","weight":"[answer]","sleepDuration":"[answer]","sleepQuality":"[answer]","energy":"[answer]","notes":"[answer]"}
+
+Start by warmly greeting the client and asking the first question.`;
+
+const EVENING_SYSTEM = `You are a warm, encouraging wellness coach assistant for JK Wellness. You are conducting an evening check-in with a client.
+
+Ask these questions ONE AT A TIME, in order. Be conversational and brief. After each answer, acknowledge warmly (1 sentence max) then ask the next question.
+
+Questions to ask:
+1. How much protein did you hit today? (in grams, or approximate)
+2. How many carbs? (in grams, or approximate)
+3. How much fat? (in grams, or approximate)
+4. How much fiber? (in grams, or approximate)
+5. What were your total calories today? (approximate is fine)
+6. How many steps did you get?
+7. Did you do any cardio today? If yes, what and how long? If no, just say "no".
+8. Did you complete a workout today? (yes/no)
+9. Any notes or questions for your coach? (or just say "none")
+
+Once you have all 9 answers, say exactly this and nothing else after it:
+CHECKIN_COMPLETE:{"protein":"[answer]","carbs":"[answer]","fats":"[answer]","fiber":"[answer]","calories":"[answer]","steps":"[answer]","cardio":"[answer]","workoutCompleted":"[answer]","notes":"[answer]"}
+
+Start by warmly greeting the client and asking the first question.`;
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let currentMode = null;
+let conversationHistory = [];
+let checkinComplete = false;
+let googleToken = null;
+let selectedDate = new Date(); // tracks which date we're logging for
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  const hour = new Date().getHours();
+  const greetingEl = document.getElementById('greeting');
+  if (hour < 12) greetingEl.textContent = 'morning';
+  else if (hour < 17) greetingEl.textContent = 'afternoon';
+  else greetingEl.textContent = 'evening';
+
+  selectedDate = new Date();
+  updateDateDisplay();
+}
+
+function updateDateDisplay() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const sel = new Date(selectedDate);
+  sel.setHours(0,0,0,0);
+
+  const isToday = sel.getTime() === today.getTime();
+
+  // Format nicely
+  const label = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const displayEl = document.getElementById('dateDisplayText');
+  displayEl.innerHTML = isToday
+    ? `Today <span class="today-tag">Today</span>`
+    : label;
+
+  // Set native input value (YYYY-MM-DD)
+  const y = selectedDate.getFullYear();
+  const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
+  const d = String(selectedDate.getDate()).padStart(2, '0');
+  document.getElementById('nativeDateInput').value = `${y}-${m}-${d}`;
+
+  // Disable next-day button if already today or future
+  document.getElementById('nextDayBtn').disabled = sel.getTime() >= today.getTime();
+}
+
+function openDatePicker() {
+  document.getElementById('nativeDateInput').showPicker
+    ? document.getElementById('nativeDateInput').showPicker()
+    : document.getElementById('nativeDateInput').click();
+}
+
+function onDateChange(val) {
+  // val is YYYY-MM-DD in local time
+  const [y, m, d] = val.split('-').map(Number);
+  selectedDate = new Date(y, m - 1, d);
+  updateDateDisplay();
+}
+
+function shiftDate(days) {
+  const newDate = new Date(selectedDate);
+  newDate.setDate(newDate.getDate() + days);
+  // Don't allow future dates
+  const today = new Date();
+  today.setHours(23,59,59,999);
+  if (newDate > today) return;
+  selectedDate = newDate;
+  updateDateDisplay();
+}
+
+// ─── CHECKIN FLOW ─────────────────────────────────────────────────────────────
+function startCheckin(mode) {
+  currentMode = mode;
+  conversationHistory = [];
+
+  document.getElementById('modeScreen').style.display = 'none';
+  document.getElementById('chatScreen').classList.add('active');
+
+  const badge = document.getElementById('modeBadge');
+  badge.style.display = 'block';
+  badge.className = `mode-badge ${mode}`;
+  badge.textContent = mode === 'morning' ? '☀️ Morning' : '🌙 Evening';
+
+  const displayDate = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('dateDisplay').textContent = displayDate;
+
+  document.getElementById('userInput').addEventListener('input', () => {
+    document.getElementById('sendBtn').disabled =
+      document.getElementById('userInput').value.trim() === '';
+  });
+
+  // Kick off conversation
+  callClaude(null);
+}
+
+// ─── MESSAGE UI ───────────────────────────────────────────────────────────────
+function addMessage(role, text) {
+  const messages = document.getElementById('messages');
+  const typing = document.getElementById('typingIndicator');
+
+  const div = document.createElement('div');
+  div.className = `message ${role === 'assistant' ? 'coach' : 'user'}`;
+
+  const label = document.createElement('div');
+  label.className = 'message-label';
+  label.textContent = role === 'assistant' ? 'Coach' : 'You';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'message-bubble';
+  bubble.textContent = text;
+
+  div.appendChild(label);
+  div.appendChild(bubble);
+  messages.insertBefore(div, typing);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function showTyping(show) {
+  document.getElementById('typingIndicator').classList.toggle('visible', show);
+  document.getElementById('messages').scrollTop =
+    document.getElementById('messages').scrollHeight;
+}
+
+function showToast(message, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast visible ${type}`;
+  setTimeout(() => toast.className = 'toast', 3000);
+}
+
+// ─── SEND ─────────────────────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text || checkinComplete) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  addMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+
+  await callClaude(text);
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ─── CLAUDE API ───────────────────────────────────────────────────────────────
+async function callClaude(userMessage) {
+  showTyping(true);
+
+  const systemPrompt = currentMode === 'morning' ? MORNING_SYSTEM : EVENING_SYSTEM;
+
+  try {
+    const response = await fetch(CONFIG.API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'claude',
+        system: systemPrompt,
+        messages: conversationHistory
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content[0].text;
+
+    showTyping(false);
+
+    // Check if check-in is complete
+    if (reply.includes('CHECKIN_COMPLETE:')) {
+      const parts = reply.split('CHECKIN_COMPLETE:');
+      const beforeData = parts[0].trim();
+
+      if (beforeData) {
+        addMessage('assistant', beforeData);
+        conversationHistory.push({ role: 'assistant', content: beforeData });
+      }
+
+      try {
+        const jsonStr = parts[1].trim();
+        const checkinData = JSON.parse(jsonStr);
+        await handleCheckinComplete(checkinData);
+      } catch (e) {
+        showToast('Error saving data. Please try again.', 'error');
+      }
+    } else {
+      addMessage('assistant', reply);
+      conversationHistory.push({ role: 'assistant', content: reply });
+    }
+
+  } catch (err) {
+    showTyping(false);
+    showToast('Connection error. Check your API key.', 'error');
+    console.error(err);
+  }
+}
+
+// ─── COMPLETE CHECK-IN ────────────────────────────────────────────────────────
+async function handleCheckinComplete(data) {
+  checkinComplete = true;
+  document.getElementById('userInput').disabled = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  showToast('Saving to your sheet...', '');
+
+  try {
+    await writeToSheet(data);
+
+    // Show success message in chat
+    const messages = document.getElementById('messages');
+    const typing = document.getElementById('typingIndicator');
+
+    const div = document.createElement('div');
+    div.className = 'message coach';
+    div.innerHTML = `
+      <div class="message-label">Coach</div>
+      <div class="success-bubble">
+        <div class="check">✓</div>
+        <p><strong>All logged!</strong> Your ${currentMode} check-in has been saved to your sheet. See you ${currentMode === 'morning' ? 'tonight' : 'tomorrow morning'}! 💪</p>
+      </div>
+    `;
+    messages.insertBefore(div, typing);
+    messages.scrollTop = messages.scrollHeight;
+
+    showToast('Saved to Google Sheets ✓', 'success');
+  } catch (err) {
+    showToast('Could not save to sheet. Check console.', 'error');
+    console.error('Sheet write error:', err);
+  }
+}
+
+// ─── GOOGLE SHEETS ────────────────────────────────────────────────────────────
+async function getGoogleToken() {
+  if (googleToken && googleToken.expires > Date.now()) return googleToken.token;
+
+  const res = await fetch(CONFIG.API_BASE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'google_token' })
+  });
+
+  const data = await res.json();
+  if (!data.token) throw new Error('Could not get Google token');
+
+  googleToken = { token: data.token, expires: Date.now() + 3500000 };
+  return googleToken.token;
+}
+
+async function findTodayRow(token) {
+  const dateStr = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}/${String(selectedDate.getFullYear()).slice(-2)}`;
+
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/Daily%20Tracker!A:A`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  const data = await res.json();
+
+  if (!data.values) throw new Error('Could not read sheet');
+
+  const rows = data.values;
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i][0] && rows[i][0].toString().trim() === dateStr) {
+      return i + 1; // 1-indexed row number
+    }
+  }
+  throw new Error(`No row found for date: ${dateStr}. Make sure this date exists in the sheet.`);
+}
+
+function colLetter(index) {
+  return String.fromCharCode(65 + index);
+}
+
+async function writeToSheet(data) {
+  const token = await getGoogleToken();
+  const rowNum = await findTodayRow(token);
+
+  let updates = [];
+
+  if (currentMode === 'morning') {
+    // Build notes field combining bedtime, sleep quality, energy + any user notes
+    const notesVal = [
+      data.bedtime ? `Bedtime: ${data.bedtime}` : '',
+      data.sleepQuality ? `Sleep quality: ${data.sleepQuality}/10` : '',
+      data.energy ? `Energy: ${data.energy}/10` : '',
+      data.notes && data.notes.toLowerCase() !== 'none' ? data.notes : ''
+    ].filter(Boolean).join(' | ');
+
+    updates = [
+      { col: COLUMNS.morningWeight, value: data.weight },
+      { col: COLUMNS.sleepDuration, value: data.sleepDuration },
+      { col: COLUMNS.notes, value: notesVal }
+    ];
+  } else {
+    // Evening
+    const notesVal = data.notes && data.notes.toLowerCase() !== 'none' ? data.notes : '';
+    updates = [
+      { col: COLUMNS.protein, value: data.protein },
+      { col: COLUMNS.carbs, value: data.carbs },
+      { col: COLUMNS.fats, value: data.fats },
+      { col: COLUMNS.fiber, value: data.fiber },
+      { col: COLUMNS.calories, value: data.calories },
+      { col: COLUMNS.steps, value: data.steps },
+      { col: COLUMNS.cardio, value: data.cardio },
+      { col: COLUMNS.workoutCompleted, value: data.workoutCompleted },
+      { col: COLUMNS.notes, value: notesVal }
+    ];
+  }
+
+  // Write each value
+  const valueData = updates.map(u => ({
+    range: `Daily Tracker!${colLetter(u.col)}${rowNum}`,
+    values: [[u.value]]
+  }));
+
+  const batchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values:batchUpdate`;
+  const res = await fetch(batchUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      valueInputOption: 'USER_ENTERED',
+      data: valueData
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(JSON.stringify(err));
+  }
+}
+
+// ─── START ─────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

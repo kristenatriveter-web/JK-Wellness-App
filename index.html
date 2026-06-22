@@ -862,7 +862,7 @@ async function callClaude(userMessage) {
       body: JSON.stringify({
         action: 'claude',
         system: systemPrompt,
-        messages: conversationHistory
+        messages: conversationHistory.length > 0 ? conversationHistory : [{ role: 'user', content: 'Hello, please begin the check-in.' }]
       })
     });
 

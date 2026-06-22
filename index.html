@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8">a
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>JK Wellness</title>
 <style>
@@ -866,8 +866,14 @@ async function callClaude(userMessage) {
       })
     });
 
-    const data = await response.json();
-    console.log('API response:', JSON.stringify(data));
+const data = await response.json();
+console.log('API response:', JSON.stringify(data));
+if (!data.content || !data.content[0]) {
+  showTyping(false);
+  showToast('API error: ' + (data.error?.message || JSON.stringify(data)), 'error');
+  return;
+}
+const reply = data.content[0].text;
     if (!data.content || !data.content[0]) {
       showTyping(false);
       showToast('API error: ' + (data.error?.message || data.error || JSON.stringify(data)), 'error');

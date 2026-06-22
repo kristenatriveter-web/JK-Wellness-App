@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">a
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>JK Wellness</title>
 <style>
@@ -543,7 +543,7 @@
     color: var(--accent);
   }
 
-  .toast. {
+  .toast.error {
     border-color: rgba(180, 80, 80, 0.3);
     color: #a05050;
   }
@@ -859,19 +859,22 @@ async function callClaude(userMessage) {
     const response = await fetch(CONFIG.API_BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({
-  action: 'claude',
-  system: systemPrompt,
-  messages: conversationHistory.length > 0 ? conversationHistory : [{ role: 'user', content: 'Hello, please begin the check-in.' }]
-})
+      body: JSON.stringify({
+        action: 'claude',
+        system: systemPrompt,
+        messages: conversationHistory
+      })
+    });
 
-const data = await response.json();
-console.log('API response:', JSON.stringify(data));
-if (!data.content || !data.content[0]) {
-  showTyping(false);
-  showToast('API error: ' + (data.error?.message || JSON.stringify(data)), 'error');
-  return;
-}    const reply = data.content[0].text;
+    const data = await response.json();
+    console.log('API response:', JSON.stringify(data));
+    if (!data.content || !data.content[0]) {
+      showTyping(false);
+      showToast('API error: ' + (data.error?.message || data.error || JSON.stringify(data)), 'error');
+      console.error('Bad response:', data);
+      return;
+    }
+    const reply = data.content[0].text;
 
     showTyping(false);
 

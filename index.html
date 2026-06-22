@@ -543,7 +543,7 @@
     color: var(--accent);
   }
 
-  .toast.error {
+  .toast. {
     border-color: rgba(180, 80, 80, 0.3);
     color: #a05050;
   }
@@ -872,15 +872,7 @@ if (!data.content || !data.content[0]) {
   showTyping(false);
   showToast('API error: ' + (data.error?.message || JSON.stringify(data)), 'error');
   return;
-}
-const reply = data.content[0].text;
-    if (!data.content || !data.content[0]) {
-      showTyping(false);
-      showToast('API error: ' + (data.error?.message || data.error || JSON.stringify(data)), 'error');
-      console.error('Bad response:', data);
-      return;
-    }
-    const reply = data.content[0].text;
+}    const reply = data.content[0].text;
 
     showTyping(false);
 

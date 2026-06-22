@@ -859,12 +859,11 @@ async function callClaude(userMessage) {
     const response = await fetch(CONFIG.API_BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'claude',
-        system: systemPrompt,
-        messages: conversationHistory
-      })
-    });
+body: JSON.stringify({
+  action: 'claude',
+  system: systemPrompt,
+  messages: conversationHistory.length > 0 ? conversationHistory : [{ role: 'user', content: 'Hello, please begin the check-in.' }]
+})
 
 const data = await response.json();
 console.log('API response:', JSON.stringify(data));

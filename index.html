@@ -867,6 +867,13 @@ async function callClaude(userMessage) {
     });
 
     const data = await response.json();
+    console.log('API response:', JSON.stringify(data));
+    if (!data.content || !data.content[0]) {
+      showTyping(false);
+      showToast('API error: ' + (data.error?.message || data.error || JSON.stringify(data)), 'error');
+      console.error('Bad response:', data);
+      return;
+    }
     const reply = data.content[0].text;
 
     showTyping(false);

@@ -57,6 +57,18 @@
     gap: 12px;
   }
 
+  .logo-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: var(--text);
+    padding: 0;
+  }
+
   .logo {
     font-family: 'Cormorant Garamond', serif;
     font-size: 17px;
@@ -66,7 +78,7 @@
     white-space: nowrap;
   }
 
-  .logo span { font-style: italic; font-weight: 300; }
+  .logo em { font-style: italic; }
 
   .mode-badge {
     font-size: 10px;
@@ -421,6 +433,34 @@
   .success-bubble p { font-size: 14px; font-weight: 300; color: var(--text-muted); line-height: 1.5; }
   .success-bubble strong { color: var(--accent); font-weight: 500; }
 
+  /* ── BOTTOM BACK BUTTON ── */
+  .bottom-back-wrap {
+    padding: 8px 16px 4px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .bottom-back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--workout);
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s;
+  }
+
+  .bottom-back-btn:hover {
+    background: var(--workout-dim);
+    border-color: var(--workout-border);
+  }
+
   /* ── TOAST ── */
   .toast {
     position: fixed; bottom: 80px; left: 50%;
@@ -440,7 +480,7 @@
 <body>
 
 <header class="header">
-  <span class="logo">Jillian <span>Keaveny</span> Wellness</span>
+  <button class="logo-btn" onclick="goHome()">Jillian Keaveny Wellness</button>
   <span class="mode-badge morning" id="modeBadge" style="display:none"></span>
 </header>
 
@@ -539,6 +579,9 @@
       <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>
   </div>
+  <div class="bottom-back-wrap">
+    <button class="bottom-back-btn" onclick="backToWorkout()">‹ Back to Workout</button>
+  </div>
   <div class="input-area">
     <div class="input-wrap">
       <textarea id="exerciseInput" placeholder="e.g. 135x8" rows="1"
@@ -557,7 +600,7 @@
 const CONFIG = {
   SHEET_ID: '1Swtih3BMsxoApMjxiTyX_mV8uHgCxVgyx2PRADkmaUs',
   API_BASE: '/api/token',
-  PROGRAM_START: new Date(2026, 5, 22)
+  PROGRAM_START: new Date(2026, 5, 15)  // June 15 2026
 };
 
 const DAILY_COLS = {
@@ -614,6 +657,18 @@ let currentExerciseIdx = null;
 let currentSetIdx = 0;
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
+function goHome() {
+  currentMode = null;
+  currentExerciseIdx = null;
+  currentSetIdx = 0;
+  checkinComplete = false;
+  setBadge(null);
+  document.getElementById('modeScreen').style.display = 'flex';
+  ['chatScreen','workoutScreen','exerciseScreen'].forEach(function(s) {
+    document.getElementById(s).classList.remove('active');
+  });
+}
+
 function init() {
   const hour = new Date().getHours();
   const g = document.getElementById('greeting');
@@ -1044,7 +1099,7 @@ async function handleSetInput(text) {
     setTimeout(function() { exerciseInput.focus(); }, 50);
   } else {
     // All sets done — ask for notes
-    addExerciseMessage('assistant', 'All sets logged! Any notes? (form, how it felt — or "none")');
+    addExerciseMessage('assistant', 'All sets logged! Any notes or questions for your coach? (form cues, how it felt, questions — or "none")');
     exerciseInput.disabled = false;
     document.getElementById('exerciseSendBtn').disabled = true;
     currentSetIdx = -1; // waiting for notes

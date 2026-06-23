@@ -539,7 +539,7 @@
 <body>
 
 <header class="header">
-  <span class="logo">Jillian <span>Keaveny</span></span>
+  <span class="logo">Jillian <span>Keaveny</span> Wellness</span>
   <span class="mode-badge morning" id="modeBadge" style="display:none"></span>
 </header>
 
@@ -1043,8 +1043,12 @@ async function loadWorkout(token, dayName) {
     const skipRows = ['Exercise', 'Steps & Cardio', 'Daily Steps', 'Program Start Date', '10,000'];
     if (inSection && cellA && cellA !== '' && !skipRows.includes(cellA) &&
         !cellA.includes('Steps') && !cellA.includes('Cardio')) {
-      const prevCol = prevWeekIndex !== null ? weekIndexToCol(prevWeekIndex) : null;
-      const prev = prevCol !== null ? (row[prevCol] || '').toString().trim() : '';
+      let prev = '';
+      if (prevWeekIndex !== null) {
+        const prevCol = weekIndexToCol(prevWeekIndex);
+        prev = (row[prevCol] || '').toString().trim();
+        console.log('Exercise:', cellA, 'prevWeekIndex:', prevWeekIndex, 'prevCol:', prevCol, 'col letter:', colLetter(prevCol), 'value:', prev);
+      }
 
       exercises.push({
         name: cellA,

@@ -514,7 +514,6 @@
     <div class="btn-arrow">›</div>
   </button>
 
-  <div class="divider"><span>or</span></div>
 
   <button class="mode-btn workout" onclick="startWorkout()">
     <div class="btn-label">💪 Workout</div>
@@ -523,7 +522,6 @@
     <div class="btn-arrow">›</div>
   </button>
 
-  <div class="divider"><span>or</span></div>
 
   <button class="mode-btn evening" onclick="startCheckin('evening')">
     <div class="btn-label">🌙 Evening</div>
@@ -579,9 +577,6 @@
       <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>
   </div>
-  <div class="bottom-back-wrap">
-    <button class="bottom-back-btn" onclick="backToWorkout()">‹ Back to Workout</button>
-  </div>
   <div class="input-area">
     <div class="input-wrap">
       <textarea id="exerciseInput" placeholder="e.g. 135x8" rows="1"
@@ -590,6 +585,9 @@
     <button class="send-btn" id="exerciseSendBtn" onclick="sendExerciseMessage()" disabled>
       <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
     </button>
+  </div>
+  <div class="bottom-back-wrap">
+    <button class="bottom-back-btn" onclick="backToWorkout()">Done! Back to Full Workout</button>
   </div>
 </div>
 
@@ -974,7 +972,9 @@ function renderExerciseList() {
     btn.onclick = function() { openExercise(idx); };
 
     const setsDisplay = log.sets.map(function(s) {
-      return s.replace(/^Set \d[^:]*:\s*/, '').replace(/^Set \d[^:]*\s*—\s*[^:]+:\s*/i, '');
+      if (s.includes('Right side')) return 'R: ' + s.replace(/^[^:]+:\s*/, '');
+      if (s.includes('Left side')) return 'L: ' + s.replace(/^[^:]+:\s*/, '');
+      return s.replace(/^[^:]+:\s*/, '');
     }).join(' / ');
 
     btn.innerHTML =
@@ -1144,7 +1144,14 @@ async function sendExerciseMessage() {
 async function finishWorkout() {
   const workoutData = workoutExercises.map(function(e, i) {
     const log = exerciseLogs[i];
-    const sets = log.sets.map(function(s) { return s.replace(/^[^:]+:\s*/, ''); }).join(' / ');
+    const sets = log.sets.map(function(s) {
+      // Preserve R/L side info: "Set 1 — Right side: 135x8" -> "R: 135x8"
+      //                         "Set 1 — Left side: 135x8"  -> "L: 135x8"
+      //                         "Set 1: 135x8"              -> "135x8"
+      if (s.includes('Right side')) return 'R: ' + s.replace(/^[^:]+:\s*/, '');
+      if (s.includes('Left side')) return 'L: ' + s.replace(/^[^:]+:\s*/, '');
+      return s.replace(/^[^:]+:\s*/, '');
+    }).join(' / ');
     return { name: e.name, sets: sets, notes: log.notes };
   });
 

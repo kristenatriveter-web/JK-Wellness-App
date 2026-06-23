@@ -23,6 +23,8 @@
     --morning-dim: rgba(160, 121, 74, 0.08);
     --evening: #6B7FA3;
     --evening-dim: rgba(107, 127, 163, 0.08);
+    --workout: #5A8A6A;
+    --workout-dim: rgba(90, 138, 106, 0.08);
     --radius: 12px;
     --radius-sm: 6px;
   }
@@ -40,7 +42,6 @@
     flex-direction: column;
   }
 
-  /* Header */
   .header {
     padding: 18px 24px 16px;
     border-bottom: 1px solid var(--border);
@@ -61,10 +62,7 @@
     color: var(--text);
   }
 
-  .logo span {
-    font-style: italic;
-    font-weight: 300;
-  }
+  .logo span { font-style: italic; font-weight: 300; }
 
   .mode-badge {
     font-family: 'Jost', sans-serif;
@@ -76,31 +74,20 @@
     text-transform: uppercase;
   }
 
-  .mode-badge.morning {
-    background: var(--morning-dim);
-    color: var(--morning);
-    border: 1px solid rgba(160, 121, 74, 0.25);
-  }
+  .mode-badge.morning { background: var(--morning-dim); color: var(--morning); border: 1px solid rgba(160,121,74,0.25); }
+  .mode-badge.evening { background: var(--evening-dim); color: var(--evening); border: 1px solid rgba(107,127,163,0.25); }
+  .mode-badge.workout { background: var(--workout-dim); color: var(--workout); border: 1px solid rgba(90,138,106,0.25); }
 
-  .mode-badge.evening {
-    background: var(--evening-dim);
-    color: var(--evening);
-    border: 1px solid rgba(107, 127, 163, 0.25);
-  }
-
-  /* Mode selector screen */
   .mode-screen {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 36px 24px;
-    gap: 14px;
+    padding: 28px 24px;
+    gap: 12px;
   }
 
-  .mode-screen .greeting-block {
-    margin-bottom: 12px;
-  }
+  .mode-screen .greeting-block { margin-bottom: 8px; }
 
   .mode-screen h1 {
     font-family: 'Cormorant Garamond', serif;
@@ -112,24 +99,13 @@
     margin-bottom: 8px;
   }
 
-  .mode-screen h1 em {
-    font-style: italic;
-    color: var(--accent);
-  }
-
-  .mode-screen p {
-    color: var(--text-muted);
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: 0.02em;
-    margin-bottom: 20px;
-  }
+  .mode-screen h1 em { font-style: italic; color: var(--accent); }
 
   .mode-btn {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 20px 22px;
+    padding: 18px 22px;
     cursor: pointer;
     text-align: left;
     transition: all 0.2s ease;
@@ -139,8 +115,7 @@
 
   .mode-btn:hover, .mode-btn:active {
     border-color: var(--accent-border);
-    background: var(--surface);
-    box-shadow: 0 2px 16px rgba(139, 115, 85, 0.1);
+    box-shadow: 0 2px 16px rgba(139,115,85,0.1);
   }
 
   .mode-btn .btn-label {
@@ -148,26 +123,23 @@
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
 
   .mode-btn.morning .btn-label { color: var(--morning); }
   .mode-btn.evening .btn-label { color: var(--evening); }
+  .mode-btn.workout .btn-label { color: var(--workout); }
 
   .mode-btn .btn-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
+    font-size: 21px;
     font-weight: 400;
     color: var(--text);
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     letter-spacing: 0.02em;
   }
 
-  .mode-btn .btn-desc {
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--text-muted);
-  }
+  .mode-btn .btn-desc { font-size: 13px; font-weight: 300; color: var(--text-muted); }
 
   .mode-btn .btn-arrow {
     position: absolute;
@@ -179,39 +151,19 @@
     font-weight: 300;
   }
 
-  /* Divider */
   .divider {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin: 4px 0;
+    margin: 2px 0;
   }
 
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .divider span {
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .divider span { font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; }
 
   /* Chat screen */
-  .chat-screen {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    display: none;
-  }
-
-  .chat-screen.active {
-    display: flex;
-  }
+  .chat-screen { flex: 1; display: none; flex-direction: column; }
+  .chat-screen.active { display: flex; }
 
   .messages {
     flex: 1;
@@ -223,10 +175,7 @@
     scroll-behavior: smooth;
   }
 
-  .message {
-    max-width: 84%;
-    animation: fadeUp 0.2s ease;
-  }
+  .message { max-width: 84%; animation: fadeUp 0.2s ease; }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(5px); }
@@ -249,6 +198,7 @@
     border: 1px solid var(--border);
     border-bottom-left-radius: 3px;
     color: var(--text);
+    white-space: pre-wrap;
   }
 
   .message.user .message-bubble {
@@ -270,12 +220,92 @@
 
   .message.user .message-label { text-align: right; }
 
-  /* Typing indicator */
-  .typing-indicator {
+  /* Workout card styles */
+  .workout-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
     align-self: flex-start;
-    display: none;
+    max-width: 92%;
+    width: 92%;
+    animation: fadeUp 0.2s ease;
   }
 
+  .workout-card-header {
+    background: var(--workout-dim);
+    border-bottom: 1px solid rgba(90,138,106,0.15);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .workout-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--workout);
+    letter-spacing: 0.02em;
+  }
+
+  .workout-card-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .exercise-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .exercise-item:last-child { border-bottom: none; }
+
+  .exercise-name {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .exercise-name a {
+    font-size: 11px;
+    color: var(--accent-light);
+    text-decoration: none;
+    font-weight: 400;
+    font-family: 'Jost', sans-serif;
+  }
+
+  .exercise-name a:hover { color: var(--accent); }
+
+  .exercise-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 4px;
+  }
+
+  .exercise-prev {
+    font-size: 12px;
+    color: var(--workout);
+    font-weight: 400;
+    background: var(--workout-dim);
+    border-radius: 6px;
+    padding: 4px 8px;
+    display: inline-block;
+    margin-top: 2px;
+  }
+
+  .exercise-prev.none { color: var(--text-dim); background: var(--surface2); }
+
+  /* Typing indicator */
+  .typing-indicator { align-self: flex-start; display: none; }
   .typing-indicator.visible { display: block; }
 
   .typing-dots {
@@ -290,8 +320,7 @@
   }
 
   .typing-dots span {
-    width: 5px;
-    height: 5px;
+    width: 5px; height: 5px;
     background: var(--text-dim);
     border-radius: 50%;
     animation: bounce 1.2s infinite;
@@ -305,7 +334,6 @@
     30% { transform: translateY(-5px); }
   }
 
-  /* Success */
   .success-bubble {
     background: var(--surface);
     border: 1px solid var(--accent-border);
@@ -314,24 +342,11 @@
     margin-top: 4px;
   }
 
-  .success-bubble .check {
-    font-size: 22px;
-    margin-bottom: 8px;
-  }
+  .success-bubble .check { font-size: 22px; margin-bottom: 8px; }
 
-  .success-bubble p {
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
+  .success-bubble p { font-size: 14px; font-weight: 300; color: var(--text-muted); line-height: 1.5; }
+  .success-bubble strong { color: var(--accent); font-weight: 500; }
 
-  .success-bubble strong {
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  /* Input area */
   .input-area {
     padding: 12px 16px 28px;
     border-top: 1px solid var(--border);
@@ -352,9 +367,7 @@
     transition: border-color 0.2s;
   }
 
-  .input-wrap:focus-within {
-    border-color: var(--accent-light);
-  }
+  .input-wrap:focus-within { border-color: var(--accent-light); }
 
   textarea {
     background: none;
@@ -371,13 +384,10 @@
     caret-color: var(--accent);
   }
 
-  textarea::placeholder {
-    color: var(--text-dim);
-  }
+  textarea::placeholder { color: var(--text-dim); }
 
   .send-btn {
-    width: 44px;
-    height: 44px;
+    width: 44px; height: 44px;
     background: var(--accent);
     border: none;
     border-radius: 50%;
@@ -391,16 +401,9 @@
 
   .send-btn:hover { background: var(--accent-light); }
   .send-btn:disabled { background: var(--border); cursor: not-allowed; }
-
-  .send-btn svg {
-    width: 17px;
-    height: 17px;
-    fill: white;
-  }
-
+  .send-btn svg { width: 17px; height: 17px; fill: white; }
   .send-btn:disabled svg { fill: var(--text-dim); }
 
-  /* Date display */
   .date-display {
     font-size: 11px;
     font-weight: 400;
@@ -411,10 +414,7 @@
     padding: 4px 0 8px;
   }
 
-  /* Date picker */
-  .date-picker-wrap {
-    margin-bottom: 8px;
-  }
+  .date-picker-wrap { margin-bottom: 4px; }
 
   .date-picker-label {
     font-size: 10px;
@@ -426,11 +426,7 @@
     display: block;
   }
 
-  .date-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .date-row { display: flex; align-items: center; gap: 10px; }
 
   .date-display-btn {
     flex: 1;
@@ -451,23 +447,13 @@
     letter-spacing: 0.01em;
   }
 
-  .date-display-btn:hover {
-    border-color: var(--accent-border);
-  }
+  .date-display-btn:hover { border-color: var(--accent-border); }
+  .date-display-btn .cal-icon { font-size: 14px; color: var(--text-dim); }
 
-  .date-display-btn .cal-icon {
-    font-size: 14px;
-    color: var(--text-dim);
-  }
-
-  .date-nav {
-    display: flex;
-    gap: 6px;
-  }
+  .date-nav { display: flex; gap: 6px; }
 
   .date-nav-btn {
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -481,29 +467,14 @@
     font-family: 'Jost', sans-serif;
   }
 
-  .date-nav-btn:hover {
-    border-color: var(--accent-border);
-    color: var(--accent);
-  }
+  .date-nav-btn:hover { border-color: var(--accent-border); color: var(--accent); }
+  .date-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  .date-nav-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-
-  .date-native-input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    width: 0;
-    height: 0;
-  }
+  .date-native-input { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
 
   .today-tag {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--accent);
     background: var(--accent-dim);
     border: 1px solid var(--accent-border);
@@ -512,41 +483,27 @@
     margin-left: 8px;
   }
 
-  /* Toast */
   .toast {
     position: fixed;
-    bottom: 90px;
-    left: 50%;
+    bottom: 90px; left: 50%;
     transform: translateX(-50%) translateY(20px);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 8px 18px;
-    font-size: 13px;
-    font-weight: 400;
+    font-size: 13px; font-weight: 400;
     color: var(--text-muted);
     opacity: 0;
     transition: all 0.3s ease;
     pointer-events: none;
     white-space: nowrap;
     z-index: 100;
-    box-shadow: 0 4px 20px rgba(44, 39, 32, 0.08);
+    box-shadow: 0 4px 20px rgba(44,39,32,0.08);
   }
 
-  .toast.visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  .toast.success {
-    border-color: var(--accent-border);
-    color: var(--accent);
-  }
-
-  .toast.error {
-    border-color: rgba(180, 80, 80, 0.3);
-    color: #a05050;
-  }
+  .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--accent-border); color: var(--accent); }
+  .toast.error { border-color: rgba(180,80,80,0.3); color: #a05050; }
 </style>
 </head>
 <body>
@@ -556,7 +513,6 @@
   <span class="mode-badge morning" id="modeBadge" style="display:none"></span>
 </header>
 
-<!-- Mode selector -->
 <div class="mode-screen" id="modeScreen">
   <div class="greeting-block">
     <h1>Good <em id="greeting"></em>,<br>let's check in.</h1>
@@ -571,13 +527,13 @@
       </button>
       <input type="date" id="nativeDateInput" class="date-native-input" onchange="onDateChange(this.value)">
       <div class="date-nav">
-        <button class="date-nav-btn" onclick="shiftDate(-1)" id="prevDayBtn" title="Previous day">‹</button>
-        <button class="date-nav-btn" onclick="shiftDate(1)" id="nextDayBtn" title="Next day">›</button>
+        <button class="date-nav-btn" onclick="shiftDate(-1)" id="prevDayBtn">‹</button>
+        <button class="date-nav-btn" onclick="shiftDate(1)" id="nextDayBtn">›</button>
       </div>
     </div>
   </div>
 
-  <p style="color:var(--text-muted);font-size:14px;font-weight:300;letter-spacing:0.02em;margin-bottom:4px;">What are you logging?</p>
+  <p style="color:var(--text-muted);font-size:14px;font-weight:300;letter-spacing:0.02em;margin-bottom:2px;">What are you logging?</p>
 
   <button class="mode-btn morning" onclick="startCheckin('morning')">
     <div class="btn-label">☀️ Morning</div>
@@ -594,27 +550,28 @@
     <div class="btn-desc">Macros, steps &amp; notes</div>
     <div class="btn-arrow">›</div>
   </button>
+
+  <div class="divider"><span>or</span></div>
+
+  <button class="mode-btn workout" onclick="startWorkout()">
+    <div class="btn-label">💪 Workout</div>
+    <div class="btn-title">Log Workout</div>
+    <div class="btn-desc">View today's program &amp; log sets</div>
+    <div class="btn-arrow">›</div>
+  </button>
 </div>
 
-<!-- Chat screen -->
 <div class="chat-screen" id="chatScreen">
   <div class="messages" id="messages">
     <div class="date-display" id="dateDisplay"></div>
     <div class="typing-indicator" id="typingIndicator">
-      <div class="typing-dots">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>
   </div>
   <div class="input-area">
     <div class="input-wrap">
-      <textarea
-        id="userInput"
-        placeholder="Type your answer..."
-        rows="1"
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"
-      ></textarea>
+      <textarea id="userInput" placeholder="Type your answer..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
     </div>
     <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
       <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
@@ -628,77 +585,86 @@
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const CONFIG = {
   SHEET_ID: '1Swtih3BMsxoApMjxiTyX_mV8uHgCxVgyx2PRADkmaUs',
-  CLIENT_NAME: 'Client',
-  API_BASE: '/api/token'  // Vercel serverless function — credentials live there
+  API_BASE: '/api/token',
+  PROGRAM_START: new Date(2026, 5, 22) // June 22 2026
 };
 
-// Column mapping for Daily Tracker (0-indexed, row has date in col A)
-// A=Date, B=Morning Weight, C=Body Fat%, D=Skeletal Muscle Mass, E=col15,
-// F=Avg Weight, G=Protein, H=Carbs, I=Fats, J=Fiber, K=Calories,
-// L=Steps, M=Cardio, N=Workout Completed, O=Sleep Duration, P=Notes, Q=Recipe/Questions
+// Daily Tracker column indices (0-based)
 const COLUMNS = {
-  date: 0,
   morningWeight: 1,
-  protein: 6,
-  carbs: 7,
-  fats: 8,
-  fiber: 9,
-  calories: 10,
-  steps: 11,
-  cardio: 12,
-  workoutCompleted: 13,
-  sleepDuration: 14,
-  notes: 15,
-  recipeQuestions: 16,
-  // Extra fields we'll store in notes if no dedicated column
-  bedtime: 'bedtime',
-  sleepQuality: 'sleepQuality',
-  energy: 'energy'
+  protein: 6, carbs: 7, fats: 8, fiber: 9, calories: 10,
+  steps: 11, cardio: 12, workoutCompleted: 13,
+  sleepDuration: 14, notes: 15
 };
 
-const MORNING_SYSTEM = `You are a warm, encouraging wellness coach assistant for JK Wellness. You are conducting a morning check-in with a client.
+// Training Program: week columns start at H (index 7)
+// Week 1: H=col7 (W×R), I=col8 (Notes)
+// Week 2: J=col9, K=col10 ... pattern: col = 7 + (weekIndex * 2)
+const WORKOUT_DAYS = {
+  0: 'Sunday: Lower',
+  1: 'Monday: Upper',
+  2: 'Tuesday: Lower',
+  6: 'Saturday: Upper'
+};
 
-Ask these questions ONE AT A TIME, in order. Be conversational and brief. After each answer, acknowledge warmly (1 sentence max) then ask the next question.
+// ─── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
+const MORNING_SYSTEM = `You are a warm, encouraging wellness coach assistant for JK Wellness. Conduct a morning check-in, asking ONE question at a time. Acknowledge each answer warmly (1 sentence) then ask the next.
 
-Questions to ask:
+Questions:
 1. What time did you go to sleep last night?
-2. What's your weight this morning? (in lbs)
+2. What's your weight this morning? (lbs)
 3. How many hours of sleep did you get?
-4. How would you rate your sleep quality? (1-10, where 1 is awful and 10 is amazing)
-5. How's your energy today? (1-10, where 1 is exhausted and 10 is flying)
-6. Any notes to start the day? (feelings, intentions, questions for your coach — or just say "none")
+4. Sleep quality? (1-10)
+5. Energy today? (1-10)
+6. Any notes to start the day? (or say "none")
 
-Once you have all 6 answers, say exactly this and nothing else after it:
+Once you have all 6 answers output EXACTLY:
 CHECKIN_COMPLETE:{"bedtime":"[answer]","weight":"[answer]","sleepDuration":"[answer]","sleepQuality":"[answer]","energy":"[answer]","notes":"[answer]"}
 
-Start by warmly greeting the client and asking the first question.`;
+Start by warmly greeting the client and asking question 1.`;
 
-const EVENING_SYSTEM = `You are a warm, encouraging wellness coach assistant for JK Wellness. You are conducting an evening check-in with a client.
+const EVENING_SYSTEM = `You are a warm, encouraging wellness coach assistant for JK Wellness. Conduct an evening check-in, asking ONE question at a time. Acknowledge each answer warmly (1 sentence) then ask the next.
 
-Ask these questions ONE AT A TIME, in order. Be conversational and brief. After each answer, acknowledge warmly (1 sentence max) then ask the next question.
+Questions:
+1. Protein today? (grams)
+2. Carbs? (grams)
+3. Fat? (grams)
+4. Fiber? (grams)
+5. Total calories?
+6. Steps today?
+7. Any cardio? (what + how long, or "no")
+8. Did you complete a workout? (yes/no)
+9. Any notes or questions for your coach? (or "none")
 
-Questions to ask:
-1. How much protein did you hit today? (in grams, or approximate)
-2. How many carbs? (in grams, or approximate)
-3. How much fat? (in grams, or approximate)
-4. How much fiber? (in grams, or approximate)
-5. What were your total calories today? (approximate is fine)
-6. How many steps did you get?
-7. Did you do any cardio today? If yes, what and how long? If no, just say "no".
-8. Did you complete a workout today? (yes/no)
-9. Any notes or questions for your coach? (or just say "none")
-
-Once you have all 9 answers, say exactly this and nothing else after it:
+Once you have all 9 answers output EXACTLY:
 CHECKIN_COMPLETE:{"protein":"[answer]","carbs":"[answer]","fats":"[answer]","fiber":"[answer]","calories":"[answer]","steps":"[answer]","cardio":"[answer]","workoutCompleted":"[answer]","notes":"[answer]"}
 
-Start by warmly greeting the client and asking the first question.`;
+Start by warmly greeting the client and asking question 1.`;
+
+const buildWorkoutSystem = (exercises) => `You are a warm, encouraging workout coach assistant for JK Wellness. The client is logging their workout set by set.
+
+Today's exercises with previous week's data:
+${exercises.map(e => `- ${e.name}: ${e.sets} sets × ${e.reps} reps | RIR: ${e.rir} | Tempo: ${e.tempo}${e.prev ? ` | Last week: ${e.prev}` : ' | First time — no previous data'}`).join('\n')}
+
+Your job:
+1. Present the workout clearly, one exercise at a time
+2. Show what they hit last week for each exercise (if available) and encourage them to match or beat it
+3. As they log sets (e.g. "135x8"), confirm and encourage, then ask if they have more sets or are ready for the next exercise
+4. Keep track of ALL sets logged for each exercise
+5. After all exercises are done, output EXACTLY this with all sets collected:
+WORKOUT_COMPLETE:${JSON.stringify(exercises.map(e => ({ name: e.name, sets: '', notes: '' })))}
+
+Replace the sets field with all logged sets joined by " / " (e.g. "135x8 / 135x6") and notes with any feedback the client gave.
+
+Start by greeting them, showing today's workout overview, then diving into the first exercise.`;
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let currentMode = null;
 let conversationHistory = [];
 let checkinComplete = false;
 let googleToken = null;
-let selectedDate = new Date(); // tracks which date we're logging for
+let selectedDate = new Date();
+let workoutExercises = [];
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 function init() {
@@ -707,44 +673,30 @@ function init() {
   if (hour < 12) greetingEl.textContent = 'morning';
   else if (hour < 17) greetingEl.textContent = 'afternoon';
   else greetingEl.textContent = 'evening';
-
   selectedDate = new Date();
   updateDateDisplay();
 }
 
 function updateDateDisplay() {
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  const sel = new Date(selectedDate);
-  sel.setHours(0,0,0,0);
-
+  const today = new Date(); today.setHours(0,0,0,0);
+  const sel = new Date(selectedDate); sel.setHours(0,0,0,0);
   const isToday = sel.getTime() === today.getTime();
-
-  // Format nicely
   const label = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  const displayEl = document.getElementById('dateDisplayText');
-  displayEl.innerHTML = isToday
-    ? `Today <span class="today-tag">Today</span>`
-    : label;
-
-  // Set native input value (YYYY-MM-DD)
+  document.getElementById('dateDisplayText').innerHTML = isToday
+    ? `Today <span class="today-tag">Today</span>` : label;
   const y = selectedDate.getFullYear();
   const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
   const d = String(selectedDate.getDate()).padStart(2, '0');
   document.getElementById('nativeDateInput').value = `${y}-${m}-${d}`;
-
-  // Disable next-day button if already today or future
   document.getElementById('nextDayBtn').disabled = sel.getTime() >= today.getTime();
 }
 
 function openDatePicker() {
-  document.getElementById('nativeDateInput').showPicker
-    ? document.getElementById('nativeDateInput').showPicker()
-    : document.getElementById('nativeDateInput').click();
+  const el = document.getElementById('nativeDateInput');
+  el.showPicker ? el.showPicker() : el.click();
 }
 
 function onDateChange(val) {
-  // val is YYYY-MM-DD in local time
   const [y, m, d] = val.split('-').map(Number);
   selectedDate = new Date(y, m - 1, d);
   updateDateDisplay();
@@ -753,18 +705,188 @@ function onDateChange(val) {
 function shiftDate(days) {
   const newDate = new Date(selectedDate);
   newDate.setDate(newDate.getDate() + days);
-  // Don't allow future dates
-  const today = new Date();
-  today.setHours(23,59,59,999);
+  const today = new Date(); today.setHours(23,59,59,999);
   if (newDate > today) return;
   selectedDate = newDate;
   updateDateDisplay();
+}
+
+// ─── WEEK CALCULATION ─────────────────────────────────────────────────────────
+function getWeekIndex(date) {
+  const start = new Date(CONFIG.PROGRAM_START); start.setHours(0,0,0,0);
+  const d = new Date(date); d.setHours(0,0,0,0);
+  const diffDays = Math.floor((d - start) / (1000 * 60 * 60 * 24));
+  return Math.max(0, Math.floor(diffDays / 7));
+}
+
+function weekIndexToCol(weekIndex) {
+  // H=col7 for week0, J=col9 for week1, L=col11 for week2...
+  return 7 + (weekIndex * 2);
+}
+
+function colLetter(index) {
+  // Supports up to Z (25), then AA etc — but we only need up to ~Z here
+  if (index < 26) return String.fromCharCode(65 + index);
+  return String.fromCharCode(64 + Math.floor(index / 26)) + String.fromCharCode(65 + (index % 26));
+}
+
+// ─── WORKOUT FLOW ─────────────────────────────────────────────────────────────
+async function startWorkout() {
+  const dayOfWeek = selectedDate.getDay(); // 0=Sun,1=Mon,2=Tue,6=Sat
+  const dayName = WORKOUT_DAYS[dayOfWeek];
+
+  if (!dayName) {
+    showToast('No workout scheduled for this day.', '');
+    return;
+  }
+
+  currentMode = 'workout';
+  conversationHistory = [];
+  checkinComplete = false;
+
+  document.getElementById('modeScreen').style.display = 'none';
+  document.getElementById('chatScreen').classList.add('active');
+
+  const badge = document.getElementById('modeBadge');
+  badge.style.display = 'block';
+  badge.className = 'mode-badge workout';
+  badge.textContent = '💪 Workout';
+
+  document.getElementById('dateDisplay').textContent =
+    selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  document.getElementById('userInput').addEventListener('input', () => {
+    document.getElementById('sendBtn').disabled =
+      document.getElementById('userInput').value.trim() === '';
+  });
+
+  showTyping(true);
+
+  try {
+    const token = await getGoogleToken();
+    const exercises = await loadWorkout(token, dayName);
+    workoutExercises = exercises;
+
+    showTyping(false);
+
+    if (exercises.length === 0) {
+      addMessage('assistant', `I couldn't find exercises for ${dayName} in your program. Please check the Training Program tab.`);
+      return;
+    }
+
+    // Show workout card
+    showWorkoutCard(dayName, exercises);
+
+    // Start Claude conversation with workout context
+    const systemPrompt = buildWorkoutSystem(exercises);
+    const kickoff = [{ role: 'user', content: 'I am ready to start my workout. Please show me what I am doing today.' }];
+    conversationHistory = kickoff;
+    await callClaude(null, systemPrompt, kickoff);
+
+  } catch (err) {
+    showTyping(false);
+    showToast('Could not load workout. Check console.', 'error');
+    console.error(err);
+  }
+}
+
+function showWorkoutCard(dayName, exercises) {
+  const messages = document.getElementById('messages');
+  const typing = document.getElementById('typingIndicator');
+
+  const card = document.createElement('div');
+  card.className = 'workout-card';
+  card.innerHTML = `
+    <div class="workout-card-header">
+      <span class="workout-card-title">${dayName}</span>
+      <span class="workout-card-label">${exercises.length} exercises</span>
+    </div>
+    ${exercises.map(e => `
+      <div class="exercise-item">
+        <div class="exercise-name">
+          ${e.name}
+          ${e.link ? `<a href="${e.link}" target="_blank">▶ Video</a>` : ''}
+        </div>
+        <div class="exercise-meta">${e.sets} sets × ${e.reps} reps | RIR ${e.rir} | Tempo ${e.tempo}</div>
+        <div class="exercise-prev ${e.prev ? '' : 'none'}">${e.prev ? '📊 Last week: ' + e.prev : '✨ First time'}</div>
+      </div>
+    `).join('')}
+  `;
+
+  messages.insertBefore(card, typing);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function loadWorkout(token, dayName) {
+  const weekIndex = getWeekIndex(selectedDate);
+  const prevWeekIndex = weekIndex > 0 ? weekIndex - 1 : null;
+
+  // Read the full Training Program sheet
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/Training%20Program!A:Z`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  const data = await res.json();
+
+  if (!data.values) throw new Error('Could not read Training Program sheet');
+  const rows = data.values;
+
+  // Find the section for this day
+  let inSection = false;
+  let headerRowIndex = -1;
+  const exercises = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const cellA = (row[0] || '').toString().trim();
+
+    // Detect section header (e.g. "Sunday: Lower")
+    if (cellA === dayName || row.join('').includes(dayName)) {
+      inSection = true;
+      continue;
+    }
+
+    // If we're in the right section, find the Exercise header row
+    if (inSection && headerRowIndex === -1 && cellA === 'Exercise') {
+      headerRowIndex = i;
+      continue;
+    }
+
+    // Stop if we hit another section
+    if (inSection && headerRowIndex !== -1 && cellA && cellA !== '' &&
+        (cellA.includes('Sunday') || cellA.includes('Monday') ||
+         cellA.includes('Tuesday') || cellA.includes('Saturday') ||
+         cellA.includes('Warm-Up'))) {
+      break;
+    }
+
+    // Parse exercise rows
+    if (inSection && headerRowIndex !== -1 && cellA && cellA !== 'Exercise') {
+      const prevCol = prevWeekIndex !== null ? weekIndexToCol(prevWeekIndex) : null;
+      const prev = prevCol !== null ? (row[prevCol] || '').toString().trim() : '';
+
+      exercises.push({
+        name: cellA,
+        link: (row[1] || '').toString().trim(),
+        sets: (row[2] || '').toString().trim(),
+        reps: (row[3] || '').toString().trim(),
+        rir: (row[4] || '').toString().trim(),
+        tempo: (row[5] || '').toString().trim(),
+        coachingNotes: (row[6] || '').toString().trim(),
+        prev: prev || null,
+        rowIndex: i + 1, // 1-indexed for Sheets API
+        weekCol: weekIndexToCol(weekIndex),
+        notesCol: weekIndexToCol(weekIndex) + 1
+      });
+    }
+  }
+
+  return exercises;
 }
 
 // ─── CHECKIN FLOW ─────────────────────────────────────────────────────────────
 function startCheckin(mode) {
   currentMode = mode;
   conversationHistory = [];
+  checkinComplete = false;
 
   document.getElementById('modeScreen').style.display = 'none';
   document.getElementById('chatScreen').classList.add('active');
@@ -774,15 +896,14 @@ function startCheckin(mode) {
   badge.className = `mode-badge ${mode}`;
   badge.textContent = mode === 'morning' ? '☀️ Morning' : '🌙 Evening';
 
-  const displayDate = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  document.getElementById('dateDisplay').textContent = displayDate;
+  document.getElementById('dateDisplay').textContent =
+    selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   document.getElementById('userInput').addEventListener('input', () => {
     document.getElementById('sendBtn').disabled =
       document.getElementById('userInput').value.trim() === '';
   });
 
-  // Kick off conversation
   callClaude(null);
 }
 
@@ -790,18 +911,14 @@ function startCheckin(mode) {
 function addMessage(role, text) {
   const messages = document.getElementById('messages');
   const typing = document.getElementById('typingIndicator');
-
   const div = document.createElement('div');
   div.className = `message ${role === 'assistant' ? 'coach' : 'user'}`;
-
   const label = document.createElement('div');
   label.className = 'message-label';
   label.textContent = role === 'assistant' ? 'Coach' : 'You';
-
   const bubble = document.createElement('div');
   bubble.className = 'message-bubble';
   bubble.textContent = text;
-
   div.appendChild(label);
   div.appendChild(bubble);
   messages.insertBefore(div, typing);
@@ -810,15 +927,14 @@ function addMessage(role, text) {
 
 function showTyping(show) {
   document.getElementById('typingIndicator').classList.toggle('visible', show);
-  document.getElementById('messages').scrollTop =
-    document.getElementById('messages').scrollHeight;
+  document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
 }
 
 function showToast(message, type = '') {
   const toast = document.getElementById('toast');
   toast.textContent = message;
   toast.className = `toast visible ${type}`;
-  setTimeout(() => toast.className = 'toast', 3000);
+  setTimeout(() => toast.className = 'toast', 3500);
 }
 
 // ─── SEND ─────────────────────────────────────────────────────────────────────
@@ -826,22 +942,16 @@ async function sendMessage() {
   const input = document.getElementById('userInput');
   const text = input.value.trim();
   if (!text || checkinComplete) return;
-
   input.value = '';
   input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
-
   addMessage('user', text);
   conversationHistory.push({ role: 'user', content: text });
-
   await callClaude(text);
 }
 
 function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
 function autoResize(el) {
@@ -850,47 +960,59 @@ function autoResize(el) {
 }
 
 // ─── CLAUDE API ───────────────────────────────────────────────────────────────
-async function callClaude(userMessage) {
+async function callClaude(userMessage, overrideSystem, overrideMessages) {
   showTyping(true);
 
-  const systemPrompt = currentMode === 'morning' ? MORNING_SYSTEM : EVENING_SYSTEM;
+  let systemPrompt;
+  if (overrideSystem) {
+    systemPrompt = overrideSystem;
+  } else {
+    systemPrompt = currentMode === 'morning' ? MORNING_SYSTEM : EVENING_SYSTEM;
+  }
+
+  const messages = overrideMessages || conversationHistory;
+  const payload = messages.length > 0
+    ? messages
+    : [{ role: 'user', content: 'Hello, please begin the check-in.' }];
 
   try {
     const response = await fetch(CONFIG.API_BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'claude',
-        system: systemPrompt,
-        messages: conversationHistory.length > 0 ? conversationHistory : [{ role: 'user', content: 'Hello, please begin the check-in.' }]
-      })
+      body: JSON.stringify({ action: 'claude', system: systemPrompt, messages: payload })
     });
 
     const data = await response.json();
-    console.log('API response:', JSON.stringify(data));
     if (!data.content || !data.content[0]) {
       showTyping(false);
-      showToast('API error: ' + (data.error?.message || data.error || JSON.stringify(data)), 'error');
-      console.error('Bad response:', data);
+      showToast('API error: ' + (data.error?.message || JSON.stringify(data)), 'error');
       return;
     }
-    const reply = data.content[0].text;
 
+    const reply = data.content[0].text;
     showTyping(false);
 
-    // Check if check-in is complete
-    if (reply.includes('CHECKIN_COMPLETE:')) {
-      const parts = reply.split('CHECKIN_COMPLETE:');
-      const beforeData = parts[0].trim();
-
-      if (beforeData) {
-        addMessage('assistant', beforeData);
-        conversationHistory.push({ role: 'assistant', content: beforeData });
+    if (currentMode === 'workout' && reply.includes('WORKOUT_COMPLETE:')) {
+      const parts = reply.split('WORKOUT_COMPLETE:');
+      if (parts[0].trim()) {
+        addMessage('assistant', parts[0].trim());
+        conversationHistory.push({ role: 'assistant', content: parts[0].trim() });
       }
-
       try {
-        const jsonStr = parts[1].trim();
-        const checkinData = JSON.parse(jsonStr);
+        const workoutData = JSON.parse(parts[1].trim());
+        await handleWorkoutComplete(workoutData);
+      } catch (e) {
+        showToast('Error saving workout. Please try again.', 'error');
+        console.error(e);
+      }
+    } else if (reply.includes('CHECKIN_COMPLETE:')) {
+      const parts = reply.split('CHECKIN_COMPLETE:');
+      if (parts[0].trim()) {
+        addMessage('assistant', parts[0].trim());
+        conversationHistory.push({ role: 'assistant', content: parts[0].trim() });
+      }
+      try {
+        const checkinData = JSON.parse(parts[1].trim());
         await handleCheckinComplete(checkinData);
       } catch (e) {
         showToast('Error saving data. Please try again.', 'error');
@@ -902,146 +1024,163 @@ async function callClaude(userMessage) {
 
   } catch (err) {
     showTyping(false);
-    showToast('Connection error. Check your API key.', 'error');
+    showToast('Connection error.', 'error');
     console.error(err);
   }
 }
 
-// ─── COMPLETE CHECK-IN ────────────────────────────────────────────────────────
+// ─── COMPLETE HANDLERS ────────────────────────────────────────────────────────
 async function handleCheckinComplete(data) {
   checkinComplete = true;
   document.getElementById('userInput').disabled = true;
   document.getElementById('sendBtn').disabled = true;
-
   showToast('Saving to your sheet...', '');
-
   try {
-    await writeToSheet(data);
-
-    // Show success message in chat
+    await writeCheckinToSheet(data);
     const messages = document.getElementById('messages');
     const typing = document.getElementById('typingIndicator');
-
     const div = document.createElement('div');
     div.className = 'message coach';
     div.innerHTML = `
       <div class="message-label">Coach</div>
       <div class="success-bubble">
         <div class="check">✓</div>
-        <p><strong>All logged!</strong> Your ${currentMode} check-in has been saved to your sheet. See you ${currentMode === 'morning' ? 'tonight' : 'tomorrow morning'}! 💪</p>
-      </div>
-    `;
+        <p><strong>All logged!</strong> Your ${currentMode} check-in has been saved. See you ${currentMode === 'morning' ? 'tonight' : 'tomorrow morning'}! 💪</p>
+      </div>`;
     messages.insertBefore(div, typing);
     messages.scrollTop = messages.scrollHeight;
-
     showToast('Saved to Google Sheets ✓', 'success');
   } catch (err) {
-    showToast('Could not save to sheet. Check console.', 'error');
-    console.error('Sheet write error:', err);
+    showToast('Could not save. Check console.', 'error');
+    console.error(err);
+  }
+}
+
+async function handleWorkoutComplete(workoutData) {
+  checkinComplete = true;
+  document.getElementById('userInput').disabled = true;
+  document.getElementById('sendBtn').disabled = true;
+  showToast('Saving workout to your sheet...', '');
+  try {
+    await writeWorkoutToSheet(workoutData);
+    const messages = document.getElementById('messages');
+    const typing = document.getElementById('typingIndicator');
+    const div = document.createElement('div');
+    div.className = 'message coach';
+    div.innerHTML = `
+      <div class="message-label">Coach</div>
+      <div class="success-bubble">
+        <div class="check">✓</div>
+        <p><strong>Workout logged!</strong> All your sets have been saved to the training program sheet. Great work today! 🏋️</p>
+      </div>`;
+    messages.insertBefore(div, typing);
+    messages.scrollTop = messages.scrollHeight;
+    showToast('Workout saved ✓', 'success');
+  } catch (err) {
+    showToast('Could not save workout. Check console.', 'error');
+    console.error(err);
   }
 }
 
 // ─── GOOGLE SHEETS ────────────────────────────────────────────────────────────
 async function getGoogleToken() {
   if (googleToken && googleToken.expires > Date.now()) return googleToken.token;
-
   const res = await fetch(CONFIG.API_BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'google_token' })
   });
-
   const data = await res.json();
   if (!data.token) throw new Error('Could not get Google token');
-
   googleToken = { token: data.token, expires: Date.now() + 3500000 };
   return googleToken.token;
 }
 
-async function findTodayRow(token) {
+async function findDateRow(token) {
   const dateStr = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}/${String(selectedDate.getFullYear()).slice(-2)}`;
-
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/Daily%20Tracker!A:A`;
   const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
   const data = await res.json();
-
   if (!data.values) throw new Error('Could not read sheet');
-
-  const rows = data.values;
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i][0] && rows[i][0].toString().trim() === dateStr) {
-      return i + 1; // 1-indexed row number
-    }
+  for (let i = 0; i < data.values.length; i++) {
+    if ((data.values[i][0] || '').toString().trim() === dateStr) return i + 1;
   }
-  throw new Error(`No row found for date: ${dateStr}. Make sure this date exists in the sheet.`);
+  throw new Error(`No row found for date: ${dateStr}`);
 }
 
-function colLetter(index) {
-  return String.fromCharCode(65 + index);
+async function batchWrite(token, updates) {
+  const batchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values:batchUpdate`;
+  const res = await fetch(batchUrl, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      valueInputOption: 'USER_ENTERED',
+      data: updates.map(u => ({ range: u.range, values: [[u.value]] }))
+    })
+  });
+  if (!res.ok) { const err = await res.json(); throw new Error(JSON.stringify(err)); }
 }
 
-async function writeToSheet(data) {
+async function writeCheckinToSheet(data) {
   const token = await getGoogleToken();
-  const rowNum = await findTodayRow(token);
+  const rowNum = await findDateRow(token);
 
   let updates = [];
-
   if (currentMode === 'morning') {
-    // Build notes field combining bedtime, sleep quality, energy + any user notes
     const notesVal = [
       data.bedtime ? `Bedtime: ${data.bedtime}` : '',
       data.sleepQuality ? `Sleep quality: ${data.sleepQuality}/10` : '',
       data.energy ? `Energy: ${data.energy}/10` : '',
       data.notes && data.notes.toLowerCase() !== 'none' ? data.notes : ''
     ].filter(Boolean).join(' | ');
-
     updates = [
-      { col: COLUMNS.morningWeight, value: data.weight },
-      { col: COLUMNS.sleepDuration, value: data.sleepDuration },
-      { col: COLUMNS.notes, value: notesVal }
+      { range: `Daily Tracker!${colLetter(COLUMNS.morningWeight)}${rowNum}`, value: data.weight },
+      { range: `Daily Tracker!${colLetter(COLUMNS.sleepDuration)}${rowNum}`, value: data.sleepDuration },
+      { range: `Daily Tracker!${colLetter(COLUMNS.notes)}${rowNum}`, value: notesVal }
     ];
   } else {
-    // Evening
     const notesVal = data.notes && data.notes.toLowerCase() !== 'none' ? data.notes : '';
     updates = [
-      { col: COLUMNS.protein, value: data.protein },
-      { col: COLUMNS.carbs, value: data.carbs },
-      { col: COLUMNS.fats, value: data.fats },
-      { col: COLUMNS.fiber, value: data.fiber },
-      { col: COLUMNS.calories, value: data.calories },
-      { col: COLUMNS.steps, value: data.steps },
-      { col: COLUMNS.cardio, value: data.cardio },
-      { col: COLUMNS.workoutCompleted, value: data.workoutCompleted },
-      { col: COLUMNS.notes, value: notesVal }
+      { range: `Daily Tracker!${colLetter(COLUMNS.protein)}${rowNum}`, value: data.protein },
+      { range: `Daily Tracker!${colLetter(COLUMNS.carbs)}${rowNum}`, value: data.carbs },
+      { range: `Daily Tracker!${colLetter(COLUMNS.fats)}${rowNum}`, value: data.fats },
+      { range: `Daily Tracker!${colLetter(COLUMNS.fiber)}${rowNum}`, value: data.fiber },
+      { range: `Daily Tracker!${colLetter(COLUMNS.calories)}${rowNum}`, value: data.calories },
+      { range: `Daily Tracker!${colLetter(COLUMNS.steps)}${rowNum}`, value: data.steps },
+      { range: `Daily Tracker!${colLetter(COLUMNS.cardio)}${rowNum}`, value: data.cardio },
+      { range: `Daily Tracker!${colLetter(COLUMNS.workoutCompleted)}${rowNum}`, value: data.workoutCompleted },
+      { range: `Daily Tracker!${colLetter(COLUMNS.notes)}${rowNum}`, value: notesVal }
     ];
   }
 
-  // Write each value
-  const valueData = updates.map(u => ({
-    range: `Daily Tracker!${colLetter(u.col)}${rowNum}`,
-    values: [[u.value]]
-  }));
-
-  const batchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values:batchUpdate`;
-  const res = await fetch(batchUrl, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      valueInputOption: 'USER_ENTERED',
-      data: valueData
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(JSON.stringify(err));
-  }
+  await batchWrite(token, updates);
 }
 
-// ─── START ─────────────────────────────────────────────────────────────────────
+async function writeWorkoutToSheet(workoutData) {
+  const token = await getGoogleToken();
+  const updates = [];
+
+  for (const logged of workoutData) {
+    // Find matching exercise in our loaded workout data
+    const exercise = workoutExercises.find(e => e.name === logged.name);
+    if (!exercise) continue;
+    if (logged.sets && logged.sets.trim()) {
+      updates.push({
+        range: `Training Program!${colLetter(exercise.weekCol)}${exercise.rowIndex}`,
+        value: logged.sets
+      });
+    }
+    if (logged.notes && logged.notes.trim()) {
+      updates.push({
+        range: `Training Program!${colLetter(exercise.notesCol)}${exercise.rowIndex}`,
+        value: logged.notes
+      });
+    }
+  }
+
+  if (updates.length > 0) await batchWrite(token, updates);
+}
+
 init();
 </script>
 </body>

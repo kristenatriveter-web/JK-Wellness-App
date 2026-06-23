@@ -829,6 +829,9 @@ async function loadWorkout(token, dayName) {
   if (!data.values) throw new Error('Could not read Training Program sheet');
   const rows = data.values;
 
+  // Debug: log first 30 rows col A to see what we're working with
+  console.log('Sheet rows (col A):', rows.slice(0, 40).map((r,i) => i+': ' + (r[0]||'(empty)')));
+
   // Find the section for this day
   let inSection = false;
   let headerRowIndex = -1;
@@ -839,27 +842,22 @@ async function loadWorkout(token, dayName) {
     const cellA = (row[0] || '').toString().trim();
 
     // Detect section header (e.g. "Sunday: Lower")
-    if (cellA === dayName || row.join('').includes(dayName)) {
+    if (cellA === dayName) {
       inSection = true;
       continue;
     }
 
-    // If we're in the right section, find the Exercise header row
-    if (inSection && headerRowIndex === -1 && cellA === 'Exercise') {
-      headerRowIndex = i;
-      continue;
-    }
-
-    // Stop if we hit another section
-    if (inSection && headerRowIndex !== -1 && cellA && cellA !== '' &&
+    // Stop if we hit another day section or warm-up section
+    if (inSection && cellA && cellA !== '' &&
         (cellA.includes('Sunday') || cellA.includes('Monday') ||
          cellA.includes('Tuesday') || cellA.includes('Saturday') ||
-         cellA.includes('Warm-Up'))) {
+         cellA.includes('Warm-Up') || cellA === 'Exercise')) {
       break;
     }
 
-    // Parse exercise rows
-    if (inSection && headerRowIndex !== -1 && cellA && cellA !== 'Exercise') {
+    // Parse exercise rows — skip empty rows and non-exercise rows
+    if (inSection && cellA && cellA !== '' && cellA !== 'Exercise' &&
+        !cellA.includes('Steps') && !cellA.includes('Cardio')) {
       const prevCol = prevWeekIndex !== null ? weekIndexToCol(prevWeekIndex) : null;
       const prev = prevCol !== null ? (row[prevCol] || '').toString().trim() : '';
 

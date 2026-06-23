@@ -883,12 +883,8 @@ function logExercise(idx) {
   const setSequence = buildSetSequence(exercise);
   
   // Show first set prompt
-  const prevText = exercise.prev ? `
-📊 Last week: ${exercise.prev}` : '
-✨ First time doing this one.';
-  const msg = `**${exercise.name}**${prevText}
-
-Log ${setSequence[0]}:`;
+  const prevText = exercise.prev ? ('\n📊 Last week: ' + exercise.prev) : '\n✨ First time doing this one.';
+  const msg = '**' + exercise.name + '**' + prevText + '\n\nLog ' + setSequence[0] + ':';
   addMessage('assistant', msg);
   conversationHistory.push({ role: 'assistant', content: msg });
 

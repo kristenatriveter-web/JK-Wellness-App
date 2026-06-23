@@ -304,6 +304,36 @@
 
   .exercise-prev.none { color: var(--text-dim); background: var(--surface2); }
 
+  /* Exercise item as button */
+  button.exercise-item {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    background: var(--surface);
+    transition: background 0.15s;
+    font-family: 'Jost', sans-serif;
+  }
+
+  button.exercise-item:hover, button.exercise-item:active {
+    background: var(--surface2);
+  }
+
+  button.exercise-item.done {
+    opacity: 0.5;
+  }
+
+  button.exercise-item.active {
+    background: var(--workout-dim);
+    border-left: 3px solid var(--workout);
+  }
+
+  .exercise-status {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--workout);
+    margin-top: 4px;
+  }
+
   /* Typing indicator */
   .typing-indicator { align-self: flex-start; display: none; }
   .typing-indicator.visible { display: block; }
@@ -665,6 +695,9 @@ let checkinComplete = false;
 let googleToken = null;
 let selectedDate = new Date();
 let workoutExercises = [];
+let currentExerciseIdx = null;  // which exercise is being logged
+let currentSetIdx = null;       // which set we're on
+let exerciseLogs = {};          // { exerciseIdx: { sets: [], notes: '' } }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 function init() {
@@ -777,11 +810,12 @@ async function startWorkout() {
     // Show workout card
     showWorkoutCard(dayName, exercises);
 
-    // Start Claude conversation with workout context
-    const systemPrompt = buildWorkoutSystem(exercises);
-    const kickoff = [{ role: 'user', content: 'I am ready to start my workout. Please show me what I am doing today.' }];
-    conversationHistory = kickoff;
-    await callClaude(null, systemPrompt, kickoff);
+    // Initialize exercise logs
+    exerciseLogs = {};
+    exercises.forEach((_, i) => { exerciseLogs[i] = { sets: [], notes: '' }; });
+
+    // Show a welcome message
+    addMessage('assistant', `Here's your ${dayName} workout! Tap any exercise to start logging your sets. You can do them in any order.`);
 
   } catch (err) {
     showTyping(false);
@@ -799,22 +833,176 @@ function showWorkoutCard(dayName, exercises) {
   card.innerHTML = `
     <div class="workout-card-header">
       <span class="workout-card-title">${dayName}</span>
-      <span class="workout-card-label">${exercises.length} exercises</span>
+      <span class="workout-card-label">Tap an exercise to log it</span>
     </div>
-    ${exercises.map(e => `
-      <div class="exercise-item">
+    ${exercises.map((e, idx) => `
+      <button class="exercise-item" id="ex-${idx}" onclick="logExercise(${idx})">
         <div class="exercise-name">
           ${e.name}
-          ${e.link ? `<a href="${e.link}" target="_blank">▶ Video</a>` : ''}
+          ${e.link ? `<a href="${e.link}" target="_blank" onclick="event.stopPropagation()">▶ Video</a>` : ''}
         </div>
-        <div class="exercise-meta">${e.sets} sets × ${e.reps} reps | RIR ${e.rir} | Tempo ${e.tempo}</div>
+        <div class="exercise-meta">${[
+          e.sets ? e.sets + ' sets' : '',
+          e.reps ? e.reps + ' reps' : '',
+          e.rir ? 'RIR ' + e.rir : '',
+          e.tempo ? 'Tempo ' + e.tempo : ''
+        ].filter(Boolean).join(' · ')}</div>
         <div class="exercise-prev ${e.prev ? '' : 'none'}">${e.prev ? '📊 Last week: ' + e.prev : '✨ First time'}</div>
-      </div>
+        <div class="exercise-status" id="ex-status-${idx}"></div>
+      </button>
     `).join('')}
   `;
 
   messages.insertBefore(card, typing);
   messages.scrollTop = messages.scrollHeight;
+}
+
+function logExercise(idx) {
+  const exercise = workoutExercises[idx];
+  if (!exercise) return;
+
+  // Mark previous active exercise as inactive
+  if (currentExerciseIdx !== null) {
+    document.getElementById(`ex-${currentExerciseIdx}`)?.classList.remove('active');
+  }
+
+  currentExerciseIdx = idx;
+  currentSetIdx = 0;
+
+  // Mark this exercise as active
+  const btn = document.getElementById(`ex-${idx}`);
+  if (btn) btn.classList.add('active');
+
+  // Focus the input
+  const input = document.getElementById('userInput');
+  input.disabled = false;
+  input.focus();
+  document.getElementById('sendBtn').disabled = false;
+
+  // Build set sequence
+  const setSequence = buildSetSequence(exercise);
+  
+  // Show first set prompt
+  const prevText = exercise.prev ? `
+📊 Last week: ${exercise.prev}` : '
+✨ First time doing this one.';
+  const msg = `**${exercise.name}**${prevText}
+
+Log ${setSequence[0]}:`;
+  addMessage('assistant', msg);
+  conversationHistory.push({ role: 'assistant', content: msg });
+
+  // Store sequence on exercise for reference
+  exercise._setSequence = setSequence;
+}
+
+function buildSetSequence(exercise) {
+  const setsStr = (exercise.sets || '1').toString().trim();
+  const isSided = setsStr.toLowerCase().includes('side');
+  const numSets = parseInt(setsStr) || 1;
+  const sequence = [];
+
+  if (isSided) {
+    for (let s = 1; s <= numSets; s++) {
+      sequence.push(`Set ${s} — Right side`);
+      sequence.push(`Set ${s} — Left side`);
+    }
+  } else {
+    for (let s = 1; s <= numSets; s++) {
+      sequence.push(`Set ${s}`);
+    }
+  }
+  return sequence;
+}
+
+async function handleWorkoutInput(text) {
+  if (currentExerciseIdx === null) return;
+
+  const exercise = workoutExercises[currentExerciseIdx];
+  const sequence = exercise._setSequence || [];
+  const log = exerciseLogs[currentExerciseIdx];
+
+  // Store this set
+  log.sets.push(`${sequence[currentSetIdx] || 'Set'}: ${text}`);
+  currentSetIdx++;
+
+  // Check if there are more sets
+  if (currentSetIdx < sequence.length) {
+    const msg = `Got it! Now log ${sequence[currentSetIdx]}:`;
+    addMessage('assistant', msg);
+    conversationHistory.push({ role: 'assistant', content: msg });
+  } else {
+    // All sets done for this exercise
+    const setsDisplay = log.sets.map(s => {
+      const parts = s.split(': ');
+      return parts.length > 1 ? parts[1] : s;
+    }).join(' / ');
+
+    // Update status on card
+    const statusEl = document.getElementById(`ex-status-${currentExerciseIdx}`);
+    if (statusEl) statusEl.textContent = '✓ ' + setsDisplay;
+
+    const btn = document.getElementById(`ex-${currentExerciseIdx}`);
+    if (btn) { btn.classList.remove('active'); btn.classList.add('done'); }
+
+    // Ask for notes
+    const msg = `Nice work! Any notes for ${exercise.name}? (form cues, how it felt, etc — or say "none")`;
+    addMessage('assistant', msg);
+    conversationHistory.push({ role: 'assistant', content: msg });
+    currentSetIdx = -1; // signal: waiting for notes
+  }
+
+  // Check if all exercises done
+  const allDone = workoutExercises.every((_, i) => exerciseLogs[i].sets.length > 0);
+  if (allDone && currentSetIdx !== -1) {
+    await finishWorkout();
+  }
+}
+
+async function handleNotesInput(text) {
+  if (currentExerciseIdx === null) return;
+  const log = exerciseLogs[currentExerciseIdx];
+  log.notes = text.toLowerCase() === 'none' ? '' : text;
+
+  const btn = document.getElementById(`ex-${currentExerciseIdx}`);
+  if (btn) btn.classList.add('done');
+
+  currentSetIdx = null;
+  currentExerciseIdx = null;
+
+  // Check if all exercises done
+  const allDone = workoutExercises.every((_, i) => exerciseLogs[i].sets.length > 0);
+  if (allDone) {
+    const remaining = workoutExercises.filter((_, i) => exerciseLogs[i].sets.length === 0);
+    if (remaining.length === 0) {
+      addMessage('assistant', 'All exercises logged! Saving your workout now...');
+      conversationHistory.push({ role: 'assistant', content: 'All exercises logged! Saving your workout now...' });
+      await finishWorkout();
+    } else {
+      addMessage('assistant', `Logged! Tap the next exercise when you're ready.`);
+      conversationHistory.push({ role: 'assistant', content: `Logged! Tap the next exercise when you're ready.` });
+    }
+  } else {
+    addMessage('assistant', `Logged! Tap the next exercise when you're ready.`);
+    conversationHistory.push({ role: 'assistant', content: `Logged! Tap the next exercise when you're ready.` });
+  }
+}
+
+async function finishWorkout() {
+  checkinComplete = true;
+  document.getElementById('userInput').disabled = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  const workoutData = workoutExercises.map((e, i) => ({
+    name: e.name,
+    sets: exerciseLogs[i].sets.map(s => {
+      const parts = s.split(': ');
+      return parts.length > 1 ? parts[1] : s;
+    }).join(' / '),
+    notes: exerciseLogs[i].notes
+  }));
+
+  await handleWorkoutComplete(workoutData);
 }
 
 async function loadWorkout(token, dayName) {
@@ -946,7 +1134,21 @@ async function sendMessage() {
   document.getElementById('sendBtn').disabled = true;
   addMessage('user', text);
   conversationHistory.push({ role: 'user', content: text });
-  await callClaude(text);
+
+  if (currentMode === 'workout') {
+    if (currentSetIdx === -1) {
+      // Waiting for notes
+      await handleNotesInput(text);
+    } else if (currentExerciseIdx !== null) {
+      // Logging a set
+      await handleWorkoutInput(text);
+    } else {
+      // No exercise selected — prompt them to tap one
+      addMessage('assistant', 'Tap an exercise on the card above to start logging it.');
+    }
+  } else {
+    await callClaude(text);
+  }
 }
 
 function handleKey(e) {

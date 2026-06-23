@@ -544,19 +544,19 @@
 
   <div class="divider"><span>or</span></div>
 
-  <button class="mode-btn evening" onclick="startCheckin('evening')">
-    <div class="btn-label">🌙 Evening</div>
-    <div class="btn-title">Evening Check-In</div>
-    <div class="btn-desc">Macros, steps &amp; notes</div>
+  <button class="mode-btn workout" onclick="startWorkout()">
+    <div class="btn-label">💪 Workout</div>
+    <div class="btn-title">Log Workout</div>
+    <div class="btn-desc">View today's program &amp; log sets</div>
     <div class="btn-arrow">›</div>
   </button>
 
   <div class="divider"><span>or</span></div>
 
-  <button class="mode-btn workout" onclick="startWorkout()">
-    <div class="btn-label">💪 Workout</div>
-    <div class="btn-title">Log Workout</div>
-    <div class="btn-desc">View today's program &amp; log sets</div>
+  <button class="mode-btn evening" onclick="startCheckin('evening')">
+    <div class="btn-label">🌙 Evening</div>
+    <div class="btn-title">Evening Check-In</div>
+    <div class="btn-desc">Macros, steps &amp; notes</div>
     <div class="btn-arrow">›</div>
   </button>
 </div>
@@ -914,7 +914,7 @@ function addMessage(role, text) {
   div.className = `message ${role === 'assistant' ? 'coach' : 'user'}`;
   const label = document.createElement('div');
   label.className = 'message-label';
-  label.textContent = role === 'assistant' ? 'Coach' : 'You';
+  label.textContent = role === 'assistant' ? 'Fern' : 'You';
   const bubble = document.createElement('div');
   bubble.className = 'message-bubble';
   bubble.textContent = text;
@@ -1041,7 +1041,7 @@ async function handleCheckinComplete(data) {
     const div = document.createElement('div');
     div.className = 'message coach';
     div.innerHTML = `
-      <div class="message-label">Coach</div>
+      <div class="message-label">Fern</div>
       <div class="success-bubble">
         <div class="check">✓</div>
         <p><strong>All logged!</strong> Your ${currentMode} check-in has been saved. See you ${currentMode === 'morning' ? 'tonight' : 'tomorrow morning'}! 💪</p>
@@ -1067,7 +1067,7 @@ async function handleWorkoutComplete(workoutData) {
     const div = document.createElement('div');
     div.className = 'message coach';
     div.innerHTML = `
-      <div class="message-label">Coach</div>
+      <div class="message-label">Fern</div>
       <div class="success-bubble">
         <div class="check">✓</div>
         <p><strong>Workout logged!</strong> All your sets have been saved to the training program sheet. Great work today! 🏋️</p>

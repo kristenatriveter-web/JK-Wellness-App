@@ -435,30 +435,28 @@
 
   /* ── BOTTOM BACK BUTTON ── */
   .bottom-back-wrap {
-    padding: 8px 16px 4px;
+    padding: 16px 20px 28px;
     border-top: 1px solid var(--border);
     background: var(--bg);
   }
 
   .bottom-back-btn {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--workout);
+    background: var(--workout);
+    border: none;
+    border-radius: var(--radius);
+    color: white;
     font-family: 'Jost', sans-serif;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 8px 16px;
+    letter-spacing: 0.04em;
+    padding: 14px;
     cursor: pointer;
     width: 100%;
-    transition: all 0.15s;
+    transition: background 0.2s;
   }
 
   .bottom-back-btn:hover {
-    background: var(--workout-dim);
-    border-color: var(--workout-border);
+    background: #4a7a5a;
   }
 
   /* ── TOAST ── */
@@ -749,17 +747,24 @@ function startCheckin(mode) {
   conversationHistory = [];
   checkinComplete = false;
 
+  // Clear all messages, then re-add date display and typing indicator
   const messages = document.getElementById('messages');
-  // Clear previous messages except typing indicator
-  while (messages.firstChild && messages.firstChild.id !== 'typingIndicator') {
-    messages.removeChild(messages.firstChild);
-  }
+  messages.innerHTML = '';
+
+  const dateDiv = document.createElement('div');
+  dateDiv.className = 'date-display';
+  dateDiv.id = 'dateDisplay';
+  dateDiv.textContent = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  messages.appendChild(dateDiv);
+
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'typing-indicator';
+  typingDiv.id = 'typingIndicator';
+  typingDiv.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  messages.appendChild(typingDiv);
 
   setBadge(mode);
   showScreen('chatScreen');
-
-  document.getElementById('dateDisplay').textContent =
-    selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   const input = document.getElementById('userInput');
   input.disabled = false;
@@ -769,7 +774,7 @@ function startCheckin(mode) {
   };
   document.getElementById('sendBtn').disabled = true;
 
-  callClaude(null);
+  setTimeout(function() { callClaude(null); }, 50);
 }
 
 // ── CHECK-IN MESSAGES ────────────────────────────────────────────────────────

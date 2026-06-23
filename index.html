@@ -25,6 +25,7 @@
     --evening-dim: rgba(107, 127, 163, 0.08);
     --workout: #5A8A6A;
     --workout-dim: rgba(90, 138, 106, 0.08);
+    --workout-border: rgba(90, 138, 106, 0.25);
     --radius: 12px;
     --radius-sm: 6px;
   }
@@ -42,8 +43,9 @@
     flex-direction: column;
   }
 
+  /* ── HEADER ── */
   .header {
-    padding: 18px 24px 16px;
+    padding: 16px 20px 14px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -52,70 +54,75 @@
     top: 0;
     background: var(--bg);
     z-index: 10;
+    gap: 12px;
   }
 
   .logo {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 19px;
+    font-size: 17px;
     font-weight: 400;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     color: var(--text);
+    white-space: nowrap;
   }
 
   .logo span { font-style: italic; font-weight: 300; }
 
   .mode-badge {
-    font-family: 'Jost', sans-serif;
     font-size: 10px;
     font-weight: 500;
-    padding: 4px 11px;
+    padding: 4px 10px;
     border-radius: 20px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .mode-badge.morning { background: var(--morning-dim); color: var(--morning); border: 1px solid rgba(160,121,74,0.25); }
   .mode-badge.evening { background: var(--evening-dim); color: var(--evening); border: 1px solid rgba(107,127,163,0.25); }
-  .mode-badge.workout { background: var(--workout-dim); color: var(--workout); border: 1px solid rgba(90,138,106,0.25); }
+  .mode-badge.workout { background: var(--workout-dim); color: var(--workout); border: 1px solid var(--workout-border); }
 
-  .mode-screen {
-    flex: 1;
+  /* ── MODE SCREEN ── */
+  .screen { flex: 1; display: none; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  #modeScreen {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 28px 24px;
-    gap: 12px;
+    padding: 24px 20px;
+    gap: 10px;
   }
 
-  .mode-screen .greeting-block { margin-bottom: 8px; }
+  .greeting-block { margin-bottom: 6px; }
 
-  .mode-screen h1 {
+  .greeting-block h1 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 36px;
+    font-size: 34px;
     font-weight: 300;
-    letter-spacing: 0.01em;
     line-height: 1.15;
     color: var(--text);
-    margin-bottom: 8px;
+    margin-bottom: 0;
   }
 
-  .mode-screen h1 em { font-style: italic; color: var(--accent); }
+  .greeting-block h1 em { font-style: italic; color: var(--accent); }
 
   .mode-btn {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 18px 22px;
+    padding: 16px 20px;
     cursor: pointer;
     text-align: left;
     transition: all 0.2s ease;
     width: 100%;
     position: relative;
+    font-family: 'Jost', sans-serif;
   }
 
   .mode-btn:hover, .mode-btn:active {
     border-color: var(--accent-border);
-    box-shadow: 0 2px 16px rgba(139,115,85,0.1);
+    box-shadow: 0 2px 12px rgba(139,115,85,0.1);
   }
 
   .mode-btn .btn-label {
@@ -123,7 +130,7 @@
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
 
   .mode-btn.morning .btn-label { color: var(--morning); }
@@ -132,340 +139,41 @@
 
   .mode-btn .btn-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 400;
     color: var(--text);
     margin-bottom: 2px;
-    letter-spacing: 0.02em;
   }
 
   .mode-btn .btn-desc { font-size: 13px; font-weight: 300; color: var(--text-muted); }
 
   .mode-btn .btn-arrow {
     position: absolute;
-    right: 20px;
-    top: 50%;
+    right: 18px; top: 50%;
     transform: translateY(-50%);
     color: var(--text-dim);
-    font-size: 22px;
-    font-weight: 300;
+    font-size: 20px;
   }
 
   .divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 2px 0;
+    display: flex; align-items: center; gap: 10px; margin: 1px 0;
   }
-
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   .divider span { font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; }
 
-  /* Chat screen */
-  .chat-screen { flex: 1; display: none; flex-direction: column; }
-  .chat-screen.active { display: flex; }
-
-  .messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    scroll-behavior: smooth;
-  }
-
-  .message { max-width: 84%; animation: fadeUp 0.2s ease; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .message.coach { align-self: flex-start; }
-  .message.user { align-self: flex-end; }
-
-  .message-bubble {
-    padding: 13px 17px;
-    border-radius: var(--radius);
-    font-size: 15px;
-    line-height: 1.55;
-    font-weight: 300;
-  }
-
-  .message.coach .message-bubble {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 3px;
-    color: var(--text);
-    white-space: pre-wrap;
-  }
-
-  .message.user .message-bubble {
-    background: var(--accent-dim);
-    border: 1px solid var(--accent-border);
-    border-bottom-right-radius: 3px;
-    color: var(--text);
-  }
-
-  .message-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 5px;
-    padding: 0 3px;
-  }
-
-  .message.user .message-label { text-align: right; }
-
-  /* Workout card styles */
-  .workout-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    align-self: flex-start;
-    max-width: 92%;
-    width: 92%;
-    animation: fadeUp 0.2s ease;
-  }
-
-  .workout-card-header {
-    background: var(--workout-dim);
-    border-bottom: 1px solid rgba(90,138,106,0.15);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .workout-card-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    font-weight: 400;
-    color: var(--workout);
-    letter-spacing: 0.02em;
-  }
-
-  .workout-card-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .exercise-item {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .exercise-item:last-child { border-bottom: none; }
-
-  .exercise-name {
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--text);
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .exercise-name a {
-    font-size: 11px;
-    color: var(--accent-light);
-    text-decoration: none;
-    font-weight: 400;
-    font-family: 'Jost', sans-serif;
-  }
-
-  .exercise-name a:hover { color: var(--accent); }
-
-  .exercise-meta {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 300;
-    margin-bottom: 4px;
-  }
-
-  .exercise-prev {
-    font-size: 12px;
-    color: var(--workout);
-    font-weight: 400;
-    background: var(--workout-dim);
-    border-radius: 6px;
-    padding: 4px 8px;
-    display: inline-block;
-    margin-top: 2px;
-  }
-
-  .exercise-prev.none { color: var(--text-dim); background: var(--surface2); }
-
-  /* Exercise item as button */
-  button.exercise-item {
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    background: var(--surface);
-    transition: background 0.15s;
-    font-family: 'Jost', sans-serif;
-  }
-
-  button.exercise-item:hover, button.exercise-item:active {
-    background: var(--surface2);
-  }
-
-  button.exercise-item.done {
-    opacity: 0.5;
-  }
-
-  button.exercise-item.active {
-    background: var(--workout-dim);
-    border-left: 3px solid var(--workout);
-  }
-
-  .exercise-status {
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--workout);
-    margin-top: 4px;
-  }
-
-  /* Typing indicator */
-  .typing-indicator { align-self: flex-start; display: none; }
-  .typing-indicator.visible { display: block; }
-
-  .typing-dots {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    border-bottom-left-radius: 3px;
-    padding: 14px 18px;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-  }
-
-  .typing-dots span {
-    width: 5px; height: 5px;
-    background: var(--text-dim);
-    border-radius: 50%;
-    animation: bounce 1.2s infinite;
-  }
-
-  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
-
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-5px); }
-  }
-
-  .success-bubble {
-    background: var(--surface);
-    border: 1px solid var(--accent-border);
-    border-radius: var(--radius);
-    padding: 18px;
-    margin-top: 4px;
-  }
-
-  .success-bubble .check { font-size: 22px; margin-bottom: 8px; }
-
-  .success-bubble p { font-size: 14px; font-weight: 300; color: var(--text-muted); line-height: 1.5; }
-  .success-bubble strong { color: var(--accent); font-weight: 500; }
-
-  .input-area {
-    padding: 12px 16px 28px;
-    border-top: 1px solid var(--border);
-    background: var(--bg);
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-  }
-
-  .input-wrap {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    display: flex;
-    align-items: flex-end;
-    padding: 11px 15px;
-    transition: border-color 0.2s;
-  }
-
-  .input-wrap:focus-within { border-color: var(--accent-light); }
-
-  textarea {
-    background: none;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'Jost', sans-serif;
-    font-size: 15px;
-    font-weight: 300;
-    resize: none;
-    width: 100%;
-    max-height: 120px;
-    line-height: 1.5;
-    caret-color: var(--accent);
-  }
-
-  textarea::placeholder { color: var(--text-dim); }
-
-  .send-btn {
-    width: 44px; height: 44px;
-    background: var(--accent);
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s;
-  }
-
-  .send-btn:hover { background: var(--accent-light); }
-  .send-btn:disabled { background: var(--border); cursor: not-allowed; }
-  .send-btn svg { width: 17px; height: 17px; fill: white; }
-  .send-btn:disabled svg { fill: var(--text-dim); }
-
-  .date-display {
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-align: center;
-    padding: 4px 0 8px;
-  }
-
+  /* ── DATE PICKER ── */
   .date-picker-wrap { margin-bottom: 4px; }
-
-  .date-picker-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 6px;
-    display: block;
-  }
-
-  .date-row { display: flex; align-items: center; gap: 10px; }
+  .date-picker-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px; display: block; }
+  .date-row { display: flex; align-items: center; gap: 8px; }
 
   .date-display-btn {
     flex: 1;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 10px 14px;
+    padding: 9px 13px;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 400;
     color: var(--text);
     text-align: left;
@@ -474,63 +182,256 @@
     align-items: center;
     justify-content: space-between;
     transition: border-color 0.2s;
-    letter-spacing: 0.01em;
   }
-
   .date-display-btn:hover { border-color: var(--accent-border); }
-  .date-display-btn .cal-icon { font-size: 14px; color: var(--text-dim); }
+  .date-display-btn .cal-icon { font-size: 13px; color: var(--text-dim); }
 
-  .date-nav { display: flex; gap: 6px; }
-
+  .date-nav { display: flex; gap: 5px; }
   .date-nav-btn {
-    width: 36px; height: 36px;
+    width: 34px; height: 34px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: 16px;
+    cursor: pointer; font-size: 15px;
     color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
-    font-family: 'Jost', sans-serif;
   }
-
   .date-nav-btn:hover { border-color: var(--accent-border); color: var(--accent); }
   .date-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
   .date-native-input { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
 
   .today-tag {
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--accent);
-    background: var(--accent-dim);
-    border: 1px solid var(--accent-border);
-    border-radius: 10px;
-    padding: 2px 8px;
-    margin-left: 8px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-dim); border: 1px solid var(--accent-border);
+    border-radius: 10px; padding: 2px 7px; margin-left: 6px;
   }
 
-  .toast {
-    position: fixed;
-    bottom: 90px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 8px 18px;
-    font-size: 13px; font-weight: 400;
+  /* ── CHECK-IN CHAT SCREEN ── */
+  #chatScreen {
+    flex-direction: column;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+  }
+
+  .message { max-width: 84%; animation: fadeUp 0.2s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  .message.coach { align-self: flex-start; }
+  .message.user { align-self: flex-end; }
+
+  .message-bubble {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 15px; line-height: 1.55; font-weight: 300;
+  }
+  .message.coach .message-bubble { background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
+  .message.user .message-bubble { background: var(--accent-dim); border: 1px solid var(--accent-border); border-bottom-right-radius: 3px; }
+  .message-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; padding: 0 3px; }
+  .message.user .message-label { text-align: right; }
+
+  .date-display { font-size: 11px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); text-align: center; padding: 4px 0 6px; }
+
+  .typing-indicator { align-self: flex-start; display: none; }
+  .typing-indicator.visible { display: block; }
+  .typing-dots { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); border-bottom-left-radius: 3px; padding: 13px 16px; display: flex; gap: 5px; align-items: center; }
+  .typing-dots span { width: 5px; height: 5px; background: var(--text-dim); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+  .input-area { padding: 10px 14px 24px; border-top: 1px solid var(--border); background: var(--bg); display: flex; gap: 8px; align-items: flex-end; }
+  .input-wrap { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: flex-end; padding: 10px 14px; transition: border-color 0.2s; }
+  .input-wrap:focus-within { border-color: var(--accent-light); }
+  textarea { background: none; border: none; outline: none; color: var(--text); font-family: 'Jost', sans-serif; font-size: 15px; font-weight: 300; resize: none; width: 100%; max-height: 120px; line-height: 1.5; caret-color: var(--accent); }
+  textarea::placeholder { color: var(--text-dim); }
+  .send-btn { width: 42px; height: 42px; background: var(--accent); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+  .send-btn:hover { background: var(--accent-light); }
+  .send-btn:disabled { background: var(--border); cursor: not-allowed; }
+  .send-btn svg { width: 16px; height: 16px; fill: white; }
+  .send-btn:disabled svg { fill: var(--text-dim); }
+
+  /* ── WORKOUT LIST SCREEN ── */
+  #workoutScreen { flex-direction: column; }
+
+  .workout-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .workout-header-top {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+  }
+
+  .workout-day-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 400;
+    color: var(--text);
+  }
+
+  .workout-progress {
+    font-size: 12px; font-weight: 400;
     color: var(--text-muted);
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    white-space: nowrap;
-    z-index: 100;
+  }
+
+  .exercise-list { flex: 1; overflow-y: auto; }
+
+  .exercise-row {
+    display: flex; align-items: stretch;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    background: var(--surface);
+    width: 100%;
+    text-align: left;
+    font-family: 'Jost', sans-serif;
+    padding: 0;
+  }
+
+  .exercise-row:hover, .exercise-row:active { background: var(--surface2); }
+
+  .exercise-row.done { opacity: 0.55; }
+
+  .exercise-row.done .exercise-row-left { border-left: 3px solid var(--workout); }
+
+  .exercise-row-left {
+    flex: 1; padding: 14px 16px;
+    border-left: 3px solid transparent;
+  }
+
+  .exercise-row-name {
+    font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .exercise-row-name a {
+    font-size: 11px; color: var(--accent-light); text-decoration: none; font-weight: 400;
+  }
+
+  .exercise-row-name a:hover { color: var(--accent); }
+
+  .exercise-row-meta { font-size: 12px; font-weight: 300; color: var(--text-muted); margin-bottom: 3px; }
+
+  .exercise-row-prev {
+    font-size: 11px; font-weight: 400;
+    color: var(--workout); display: inline-block;
+  }
+
+  .exercise-row-prev.none { color: var(--text-dim); }
+
+  .exercise-row-logged {
+    font-size: 12px; font-weight: 400;
+    color: var(--workout); margin-top: 3px;
+  }
+
+  .exercise-row-right {
+    padding: 14px 14px 14px 0;
+    display: flex; align-items: center;
+    color: var(--text-dim); font-size: 18px;
+  }
+
+  .exercise-row.done .exercise-row-right { color: var(--workout); font-size: 16px; }
+
+  .finish-workout-wrap {
+    padding: 16px 20px 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .finish-btn {
+    width: 100%;
+    background: var(--workout);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px;
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.2s;
+  }
+
+  .finish-btn:hover { background: #4a7a5a; }
+  .finish-btn:disabled { background: var(--border); color: var(--text-dim); cursor: not-allowed; }
+
+  /* ── EXERCISE DETAIL SCREEN ── */
+  #exerciseScreen { flex-direction: column; }
+
+  .exercise-detail-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: none;
+    color: var(--workout); font-family: 'Jost', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; padding: 0;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .back-btn:hover { color: var(--accent); }
+
+  .exercise-detail-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; font-weight: 400;
+    color: var(--text); margin-bottom: 4px;
+  }
+
+  .exercise-detail-meta {
+    font-size: 13px; font-weight: 300; color: var(--text-muted);
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+  }
+
+  .exercise-detail-meta a { color: var(--accent-light); text-decoration: none; font-size: 12px; }
+  .exercise-detail-meta a:hover { color: var(--accent); }
+
+  .exercise-detail-prev {
+    font-size: 12px; font-weight: 400;
+    color: var(--workout);
+    background: var(--workout-dim);
+    border-radius: 6px;
+    padding: 5px 10px;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  .exercise-detail-prev.none { color: var(--text-dim); background: var(--surface2); }
+
+  /* ── SUCCESS ── */
+  .success-bubble {
+    background: var(--surface);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius);
+    padding: 16px; margin-top: 4px;
+  }
+  .success-bubble .check { font-size: 20px; margin-bottom: 6px; }
+  .success-bubble p { font-size: 14px; font-weight: 300; color: var(--text-muted); line-height: 1.5; }
+  .success-bubble strong { color: var(--accent); font-weight: 500; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 7px 16px;
+    font-size: 13px; font-weight: 400; color: var(--text-muted);
+    opacity: 0; transition: all 0.3s ease;
+    pointer-events: none; white-space: nowrap; z-index: 100;
     box-shadow: 0 4px 20px rgba(44,39,32,0.08);
   }
-
   .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.success { border-color: var(--accent-border); color: var(--accent); }
   .toast.error { border-color: rgba(180,80,80,0.3); color: #a05050; }
@@ -543,7 +444,8 @@
   <span class="mode-badge morning" id="modeBadge" style="display:none"></span>
 </header>
 
-<div class="mode-screen" id="modeScreen">
+<!-- ── MODE SELECTOR ── -->
+<div id="modeScreen">
   <div class="greeting-block">
     <h1>Good <em id="greeting"></em>,<br>let's check in.</h1>
   </div>
@@ -563,7 +465,7 @@
     </div>
   </div>
 
-  <p style="color:var(--text-muted);font-size:14px;font-weight:300;letter-spacing:0.02em;margin-bottom:2px;">What are you logging?</p>
+  <p style="color:var(--text-muted);font-size:13px;font-weight:300;letter-spacing:0.02em;">What are you logging?</p>
 
   <button class="mode-btn morning" onclick="startCheckin('morning')">
     <div class="btn-label">☀️ Morning</div>
@@ -591,7 +493,8 @@
   </button>
 </div>
 
-<div class="chat-screen" id="chatScreen">
+<!-- ── CHECK-IN CHAT ── -->
+<div id="chatScreen" class="screen">
   <div class="messages" id="messages">
     <div class="date-display" id="dateDisplay"></div>
     <div class="typing-indicator" id="typingIndicator">
@@ -609,36 +512,64 @@
   </div>
 </div>
 
+<!-- ── WORKOUT LIST ── -->
+<div id="workoutScreen" class="screen">
+  <div class="workout-header">
+    <div class="workout-header-top">
+      <span class="workout-day-title" id="workoutDayTitle"></span>
+      <span class="workout-progress" id="workoutProgress"></span>
+    </div>
+  </div>
+  <div class="exercise-list" id="exerciseList"></div>
+  <div class="finish-workout-wrap">
+    <button class="finish-btn" id="finishBtn" onclick="finishWorkout()" disabled>Save Workout</button>
+  </div>
+</div>
+
+<!-- ── EXERCISE DETAIL ── -->
+<div id="exerciseScreen" class="screen">
+  <div class="exercise-detail-header">
+    <button class="back-btn" onclick="backToWorkout()">‹ Back to Workout</button>
+    <div class="exercise-detail-name" id="detailName"></div>
+    <div class="exercise-detail-meta" id="detailMeta"></div>
+    <div class="exercise-detail-prev" id="detailPrev"></div>
+  </div>
+  <div class="messages" id="exerciseMessages">
+    <div class="typing-indicator" id="exerciseTyping">
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+  <div class="input-area">
+    <div class="input-wrap">
+      <textarea id="exerciseInput" placeholder="e.g. 135x8" rows="1"
+        onkeydown="handleExerciseKey(event)" oninput="autoResize(this)"></textarea>
+    </div>
+    <button class="send-btn" id="exerciseSendBtn" onclick="sendExerciseMessage()" disabled>
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+    </button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// ── CONFIG ──────────────────────────────────────────────────────────────────
 const CONFIG = {
   SHEET_ID: '1Swtih3BMsxoApMjxiTyX_mV8uHgCxVgyx2PRADkmaUs',
   API_BASE: '/api/token',
-  PROGRAM_START: new Date(2026, 5, 22) // June 22 2026
+  PROGRAM_START: new Date(2026, 5, 22)
 };
 
-// Daily Tracker column indices (0-based)
-const COLUMNS = {
-  morningWeight: 1,
-  protein: 6, carbs: 7, fats: 8, fiber: 9, calories: 10,
-  steps: 11, cardio: 12, workoutCompleted: 13,
-  sleepDuration: 14, notes: 15
+const DAILY_COLS = {
+  morningWeight: 1, protein: 6, carbs: 7, fats: 8,
+  fiber: 9, calories: 10, steps: 11, cardio: 12,
+  workoutCompleted: 13, sleepDuration: 14, notes: 15
 };
 
-// Training Program: week columns start at H (index 7)
-// Week 1: H=col7 (W×R), I=col8 (Notes)
-// Week 2: J=col9, K=col10 ... pattern: col = 7 + (weekIndex * 2)
-const WORKOUT_DAYS = {
-  0: 'Sunday: Lower',
-  1: 'Monday: Upper',
-  2: 'Tuesday: Lower',
-  6: 'Saturday: Upper'
-};
+const WORKOUT_DAYS = { 0: 'Sunday: Lower', 1: 'Monday: Upper', 2: 'Tuesday: Lower', 6: 'Saturday: Upper' };
 
-// ─── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
-const MORNING_SYSTEM = `You are a warm, encouraging wellness coach assistant for JK Wellness. Conduct a morning check-in, asking ONE question at a time. Acknowledge each answer warmly (1 sentence) then ask the next.
+// ── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
+const MORNING_SYSTEM = `You are Fern, a warm encouraging wellness coach for JK Wellness. Ask ONE question at a time. After each answer give a brief warm acknowledgment (1 sentence), then ask the next.
 
 Questions:
 1. What time did you go to sleep last night?
@@ -646,14 +577,14 @@ Questions:
 3. How many hours of sleep did you get?
 4. Sleep quality? (1-10)
 5. Energy today? (1-10)
-6. Any notes to start the day? (or say "none")
+6. Any notes to start the day? (or "none")
 
-Once you have all 6 answers output EXACTLY:
+When you have all 6 answers output EXACTLY:
 CHECKIN_COMPLETE:{"bedtime":"[answer]","weight":"[answer]","sleepDuration":"[answer]","sleepQuality":"[answer]","energy":"[answer]","notes":"[answer]"}
 
-Start by warmly greeting the client and asking question 1.`;
+Begin by greeting the client warmly and asking question 1.`;
 
-const EVENING_SYSTEM = `You are a warm, encouraging wellness coach assistant for JK Wellness. Conduct an evening check-in, asking ONE question at a time. Acknowledge each answer warmly (1 sentence) then ask the next.
+const EVENING_SYSTEM = `You are Fern, a warm encouraging wellness coach for JK Wellness. Ask ONE question at a time. After each answer give a brief warm acknowledgment (1 sentence), then ask the next.
 
 Questions:
 1. Protein today? (grams)
@@ -666,46 +597,27 @@ Questions:
 8. Did you complete a workout? (yes/no)
 9. Any notes or questions for your coach? (or "none")
 
-Once you have all 9 answers output EXACTLY:
+When you have all 9 answers output EXACTLY:
 CHECKIN_COMPLETE:{"protein":"[answer]","carbs":"[answer]","fats":"[answer]","fiber":"[answer]","calories":"[answer]","steps":"[answer]","cardio":"[answer]","workoutCompleted":"[answer]","notes":"[answer]"}
 
-Start by warmly greeting the client and asking question 1.`;
+Begin by greeting the client warmly and asking question 1.`;
 
-const buildWorkoutSystem = (exercises) => `You are a warm, encouraging workout coach assistant for JK Wellness. The client is logging their workout set by set.
-
-Today's exercises with previous week's data:
-${exercises.map(e => `- ${e.name}: ${e.sets} sets × ${e.reps} reps | RIR: ${e.rir} | Tempo: ${e.tempo}${e.prev ? ` | Last week: ${e.prev}` : ' | First time — no previous data'}`).join('\n')}
-
-Your job:
-1. Present the workout clearly, one exercise at a time
-2. Show what they hit last week for each exercise (if available) and encourage them to match or beat it
-3. As they log sets (e.g. "135x8"), confirm and encourage, then ask if they have more sets or are ready for the next exercise
-4. Keep track of ALL sets logged for each exercise
-5. After all exercises are done, output EXACTLY this with all sets collected:
-WORKOUT_COMPLETE:${JSON.stringify(exercises.map(e => ({ name: e.name, sets: '', notes: '' })))}
-
-Replace the sets field with all logged sets joined by " / " (e.g. "135x8 / 135x6") and notes with any feedback the client gave.
-
-Start by greeting them, showing today's workout overview, then diving into the first exercise.`;
-
-// ─── STATE ────────────────────────────────────────────────────────────────────
+// ── STATE ────────────────────────────────────────────────────────────────────
 let currentMode = null;
 let conversationHistory = [];
 let checkinComplete = false;
 let googleToken = null;
 let selectedDate = new Date();
 let workoutExercises = [];
-let currentExerciseIdx = null;  // which exercise is being logged
-let currentSetIdx = null;       // which set we're on
-let exerciseLogs = {};          // { exerciseIdx: { sets: [], notes: '' } }
+let exerciseLogs = {};
+let currentExerciseIdx = null;
+let currentSetIdx = 0;
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────────────────────
 function init() {
   const hour = new Date().getHours();
-  const greetingEl = document.getElementById('greeting');
-  if (hour < 12) greetingEl.textContent = 'morning';
-  else if (hour < 17) greetingEl.textContent = 'afternoon';
-  else greetingEl.textContent = 'evening';
+  const g = document.getElementById('greeting');
+  g.textContent = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
   selectedDate = new Date();
   updateDateDisplay();
 }
@@ -716,11 +628,11 @@ function updateDateDisplay() {
   const isToday = sel.getTime() === today.getTime();
   const label = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   document.getElementById('dateDisplayText').innerHTML = isToday
-    ? `Today <span class="today-tag">Today</span>` : label;
+    ? 'Today <span class="today-tag">Today</span>' : label;
   const y = selectedDate.getFullYear();
   const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
   const d = String(selectedDate.getDate()).padStart(2, '0');
-  document.getElementById('nativeDateInput').value = `${y}-${m}-${d}`;
+  document.getElementById('nativeDateInput').value = y + '-' + m + '-' + d;
   document.getElementById('nextDayBtn').disabled = sel.getTime() >= today.getTime();
 }
 
@@ -730,376 +642,89 @@ function openDatePicker() {
 }
 
 function onDateChange(val) {
-  const [y, m, d] = val.split('-').map(Number);
-  selectedDate = new Date(y, m - 1, d);
+  const parts = val.split('-').map(Number);
+  selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
   updateDateDisplay();
 }
 
 function shiftDate(days) {
-  const newDate = new Date(selectedDate);
-  newDate.setDate(newDate.getDate() + days);
+  const nd = new Date(selectedDate);
+  nd.setDate(nd.getDate() + days);
   const today = new Date(); today.setHours(23,59,59,999);
-  if (newDate > today) return;
-  selectedDate = newDate;
+  if (nd > today) return;
+  selectedDate = nd;
   updateDateDisplay();
 }
 
-// ─── WEEK CALCULATION ─────────────────────────────────────────────────────────
+// ── SCREEN NAVIGATION ────────────────────────────────────────────────────────
+function showScreen(id) {
+  ['modeScreen','chatScreen','workoutScreen','exerciseScreen'].forEach(s => {
+    const el = document.getElementById(s);
+    if (s === 'modeScreen') {
+      el.style.display = s === id ? 'flex' : 'none';
+    } else {
+      el.classList.toggle('active', s === id);
+    }
+  });
+}
+
+function setBadge(mode) {
+  const badge = document.getElementById('modeBadge');
+  const labels = { morning: '☀️ Morning', evening: '🌙 Evening', workout: '💪 Workout' };
+  badge.style.display = mode ? 'block' : 'none';
+  badge.className = 'mode-badge ' + (mode || '');
+  badge.textContent = labels[mode] || '';
+}
+
+// ── WEEK / COLUMN HELPERS ────────────────────────────────────────────────────
 function getWeekIndex(date) {
   const start = new Date(CONFIG.PROGRAM_START); start.setHours(0,0,0,0);
   const d = new Date(date); d.setHours(0,0,0,0);
-  const diffDays = Math.floor((d - start) / (1000 * 60 * 60 * 24));
-  return Math.max(0, Math.floor(diffDays / 7));
+  return Math.max(0, Math.floor((d - start) / (7 * 24 * 60 * 60 * 1000)));
 }
 
-function weekIndexToCol(weekIndex) {
-  // H=col7 for week0, J=col9 for week1, L=col11 for week2...
-  return 7 + (weekIndex * 2);
+function weekCol(weekIdx) { return 7 + weekIdx * 2; }
+
+function colLetter(idx) {
+  if (idx < 26) return String.fromCharCode(65 + idx);
+  return String.fromCharCode(64 + Math.floor(idx / 26)) + String.fromCharCode(65 + (idx % 26));
 }
 
-function colLetter(index) {
-  // Supports up to Z (25), then AA etc — but we only need up to ~Z here
-  if (index < 26) return String.fromCharCode(65 + index);
-  return String.fromCharCode(64 + Math.floor(index / 26)) + String.fromCharCode(65 + (index % 26));
-}
-
-// ─── WORKOUT FLOW ─────────────────────────────────────────────────────────────
-async function startWorkout() {
-  const dayOfWeek = selectedDate.getDay(); // 0=Sun,1=Mon,2=Tue,6=Sat
-  const dayName = WORKOUT_DAYS[dayOfWeek];
-
-  if (!dayName) {
-    showToast('No workout scheduled for this day.', '');
-    return;
-  }
-
-  currentMode = 'workout';
-  conversationHistory = [];
-  checkinComplete = false;
-
-  document.getElementById('modeScreen').style.display = 'none';
-  document.getElementById('chatScreen').classList.add('active');
-
-  const badge = document.getElementById('modeBadge');
-  badge.style.display = 'block';
-  badge.className = 'mode-badge workout';
-  badge.textContent = '💪 Workout';
-
-  document.getElementById('dateDisplay').textContent =
-    selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-  document.getElementById('userInput').addEventListener('input', () => {
-    document.getElementById('sendBtn').disabled =
-      document.getElementById('userInput').value.trim() === '';
-  });
-
-  showTyping(true);
-
-  try {
-    const token = await getGoogleToken();
-    const exercises = await loadWorkout(token, dayName);
-    workoutExercises = exercises;
-
-    showTyping(false);
-
-    if (exercises.length === 0) {
-      addMessage('assistant', `I couldn't find exercises for ${dayName} in your program. Please check the Training Program tab.`);
-      return;
-    }
-
-    // Show workout card
-    showWorkoutCard(dayName, exercises);
-
-    // Initialize exercise logs
-    exerciseLogs = {};
-    exercises.forEach((_, i) => { exerciseLogs[i] = { sets: [], notes: '' }; });
-
-    // Show a welcome message
-    addMessage('assistant', `Here's your ${dayName} workout! Tap any exercise to start logging your sets. You can do them in any order.`);
-
-  } catch (err) {
-    showTyping(false);
-    showToast('Could not load workout. Check console.', 'error');
-    console.error(err);
-  }
-}
-
-function showWorkoutCard(dayName, exercises) {
-  const messages = document.getElementById('messages');
-  const typing = document.getElementById('typingIndicator');
-
-  const card = document.createElement('div');
-  card.className = 'workout-card';
-  card.innerHTML = `
-    <div class="workout-card-header">
-      <span class="workout-card-title">${dayName}</span>
-      <span class="workout-card-label">Tap an exercise to log it</span>
-    </div>
-    ${exercises.map((e, idx) => `
-      <button class="exercise-item" id="ex-${idx}" onclick="logExercise(${idx})">
-        <div class="exercise-name">
-          ${e.name}
-          ${e.link ? `<a href="${e.link}" target="_blank" onclick="event.stopPropagation()">▶ Video</a>` : ''}
-        </div>
-        <div class="exercise-meta">${[
-          e.sets ? e.sets + ' sets' : '',
-          e.reps ? e.reps + ' reps' : '',
-          e.rir ? 'RIR ' + e.rir : '',
-          e.tempo ? 'Tempo ' + e.tempo : ''
-        ].filter(Boolean).join(' · ')}</div>
-        <div class="exercise-prev ${e.prev ? '' : 'none'}">${e.prev ? '📊 Last week: ' + e.prev : '✨ First time'}</div>
-        <div class="exercise-status" id="ex-status-${idx}"></div>
-      </button>
-    `).join('')}
-  `;
-
-  messages.insertBefore(card, typing);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function logExercise(idx) {
-  const exercise = workoutExercises[idx];
-  if (!exercise) return;
-
-  // Mark previous active exercise as inactive
-  if (currentExerciseIdx !== null) {
-    document.getElementById(`ex-${currentExerciseIdx}`)?.classList.remove('active');
-  }
-
-  currentExerciseIdx = idx;
-  currentSetIdx = 0;
-
-  // Mark this exercise as active
-  const btn = document.getElementById(`ex-${idx}`);
-  if (btn) btn.classList.add('active');
-
-  // Focus the input
-  const input = document.getElementById('userInput');
-  input.disabled = false;
-  input.focus();
-  document.getElementById('sendBtn').disabled = false;
-
-  // Build set sequence
-  const setSequence = buildSetSequence(exercise);
-  
-  // Show first set prompt
-  const prevText = exercise.prev ? ('\n📊 Last week: ' + exercise.prev) : '\n✨ First time doing this one.';
-  const msg = '**' + exercise.name + '**' + prevText + '\n\nLog ' + setSequence[0] + ':';
-  addMessage('assistant', msg);
-  conversationHistory.push({ role: 'assistant', content: msg });
-
-  // Store sequence on exercise for reference
-  exercise._setSequence = setSequence;
-}
-
-function buildSetSequence(exercise) {
-  const setsStr = (exercise.sets || '1').toString().trim();
-  const isSided = setsStr.toLowerCase().includes('side');
-  const numSets = parseInt(setsStr) || 1;
-  const sequence = [];
-
-  if (isSided) {
-    for (let s = 1; s <= numSets; s++) {
-      sequence.push(`Set ${s} — Right side`);
-      sequence.push(`Set ${s} — Left side`);
-    }
-  } else {
-    for (let s = 1; s <= numSets; s++) {
-      sequence.push(`Set ${s}`);
-    }
-  }
-  return sequence;
-}
-
-async function handleWorkoutInput(text) {
-  if (currentExerciseIdx === null) return;
-
-  const exercise = workoutExercises[currentExerciseIdx];
-  const sequence = exercise._setSequence || [];
-  const log = exerciseLogs[currentExerciseIdx];
-
-  // Store this set
-  log.sets.push(`${sequence[currentSetIdx] || 'Set'}: ${text}`);
-  currentSetIdx++;
-
-  // Check if there are more sets
-  if (currentSetIdx < sequence.length) {
-    const msg = `Got it! Now log ${sequence[currentSetIdx]}:`;
-    addMessage('assistant', msg);
-    conversationHistory.push({ role: 'assistant', content: msg });
-  } else {
-    // All sets done for this exercise
-    const setsDisplay = log.sets.map(s => {
-      const parts = s.split(': ');
-      return parts.length > 1 ? parts[1] : s;
-    }).join(' / ');
-
-    // Update status on card
-    const statusEl = document.getElementById(`ex-status-${currentExerciseIdx}`);
-    if (statusEl) statusEl.textContent = '✓ ' + setsDisplay;
-
-    const btn = document.getElementById(`ex-${currentExerciseIdx}`);
-    if (btn) { btn.classList.remove('active'); btn.classList.add('done'); }
-
-    // Ask for notes
-    const msg = `Nice work! Any notes for ${exercise.name}? (form cues, how it felt, etc — or say "none")`;
-    addMessage('assistant', msg);
-    conversationHistory.push({ role: 'assistant', content: msg });
-    currentSetIdx = -1; // signal: waiting for notes
-  }
-
-  // Check if all exercises done
-  const allDone = workoutExercises.every((_, i) => exerciseLogs[i].sets.length > 0);
-  if (allDone && currentSetIdx !== -1) {
-    await finishWorkout();
-  }
-}
-
-async function handleNotesInput(text) {
-  if (currentExerciseIdx === null) return;
-  const log = exerciseLogs[currentExerciseIdx];
-  log.notes = text.toLowerCase() === 'none' ? '' : text;
-
-  const btn = document.getElementById(`ex-${currentExerciseIdx}`);
-  if (btn) btn.classList.add('done');
-
-  currentSetIdx = null;
-  currentExerciseIdx = null;
-
-  // Check if all exercises done
-  const allDone = workoutExercises.every((_, i) => exerciseLogs[i].sets.length > 0);
-  if (allDone) {
-    const remaining = workoutExercises.filter((_, i) => exerciseLogs[i].sets.length === 0);
-    if (remaining.length === 0) {
-      addMessage('assistant', 'All exercises logged! Saving your workout now...');
-      conversationHistory.push({ role: 'assistant', content: 'All exercises logged! Saving your workout now...' });
-      await finishWorkout();
-    } else {
-      addMessage('assistant', `Logged! Tap the next exercise when you're ready.`);
-      conversationHistory.push({ role: 'assistant', content: `Logged! Tap the next exercise when you're ready.` });
-    }
-  } else {
-    addMessage('assistant', `Logged! Tap the next exercise when you're ready.`);
-    conversationHistory.push({ role: 'assistant', content: `Logged! Tap the next exercise when you're ready.` });
-  }
-}
-
-async function finishWorkout() {
-  checkinComplete = true;
-  document.getElementById('userInput').disabled = true;
-  document.getElementById('sendBtn').disabled = true;
-
-  const workoutData = workoutExercises.map((e, i) => ({
-    name: e.name,
-    sets: exerciseLogs[i].sets.map(s => {
-      const parts = s.split(': ');
-      return parts.length > 1 ? parts[1] : s;
-    }).join(' / '),
-    notes: exerciseLogs[i].notes
-  }));
-
-  await handleWorkoutComplete(workoutData);
-}
-
-async function loadWorkout(token, dayName) {
-  const weekIndex = getWeekIndex(selectedDate);
-  const prevWeekIndex = weekIndex > 0 ? weekIndex - 1 : null;
-
-  // Read the full Training Program sheet
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/Training%20Program!A:Z`;
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  const data = await res.json();
-
-  if (!data.values) throw new Error('Could not read Training Program sheet');
-  const rows = data.values;
-
-  // Debug: log first 30 rows col A to see what we're working with
-  console.log('Sheet rows (col A):', rows.slice(0, 40).map((r,i) => i+': ' + (r[0]||'(empty)')));
-
-  // Find the section for this day
-  let inSection = false;
-  let headerRowIndex = -1;
-  const exercises = [];
-
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    const cellA = (row[0] || '').toString().trim();
-
-    // Detect section header (e.g. "Sunday: Lower")
-    if (cellA === dayName) {
-      inSection = true;
-      continue;
-    }
-
-    // Stop if we hit another day section or warm-up section
-    if (inSection && cellA && cellA !== '' &&
-        (cellA === 'Sunday: Lower' || cellA === 'Monday: Upper' ||
-         cellA === 'Tuesday: Lower' || cellA === 'Saturday: Upper' ||
-         cellA.includes('Warm-Up'))) {
-      break;
-    }
-
-    // Skip non-exercise rows
-    const skipRows = ['Exercise', 'Steps & Cardio', 'Daily Steps', 'Program Start Date', '10,000'];
-    if (inSection && cellA && cellA !== '' && !skipRows.includes(cellA) &&
-        !cellA.includes('Steps') && !cellA.includes('Cardio')) {
-      let prev = '';
-      if (prevWeekIndex !== null) {
-        const prevCol = weekIndexToCol(prevWeekIndex);
-        prev = (row[prevCol] || '').toString().trim();
-        console.log('Exercise:', cellA, 'prevWeekIndex:', prevWeekIndex, 'prevCol:', prevCol, 'col letter:', colLetter(prevCol), 'value:', prev);
-      }
-
-      exercises.push({
-        name: cellA,
-        link: (row[1] || '').toString().trim(),
-        sets: (row[2] || '').toString().trim(),
-        reps: (row[3] || '').toString().trim(),
-        rir: (row[4] || '').toString().trim(),
-        tempo: (row[5] || '').toString().trim(),
-        coachingNotes: (row[6] || '').toString().trim(),
-        prev: prev || null,
-        rowIndex: i + 1, // 1-indexed for Sheets API
-        weekCol: weekIndexToCol(weekIndex),
-        notesCol: weekIndexToCol(weekIndex) + 1
-      });
-    }
-  }
-
-  return exercises;
-}
-
-// ─── CHECKIN FLOW ─────────────────────────────────────────────────────────────
+// ── CHECKIN FLOW ─────────────────────────────────────────────────────────────
 function startCheckin(mode) {
   currentMode = mode;
   conversationHistory = [];
   checkinComplete = false;
 
-  document.getElementById('modeScreen').style.display = 'none';
-  document.getElementById('chatScreen').classList.add('active');
+  const messages = document.getElementById('messages');
+  // Clear previous messages except typing indicator
+  while (messages.firstChild && messages.firstChild.id !== 'typingIndicator') {
+    messages.removeChild(messages.firstChild);
+  }
 
-  const badge = document.getElementById('modeBadge');
-  badge.style.display = 'block';
-  badge.className = `mode-badge ${mode}`;
-  badge.textContent = mode === 'morning' ? '☀️ Morning' : '🌙 Evening';
+  setBadge(mode);
+  showScreen('chatScreen');
 
   document.getElementById('dateDisplay').textContent =
     selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  document.getElementById('userInput').addEventListener('input', () => {
-    document.getElementById('sendBtn').disabled =
-      document.getElementById('userInput').value.trim() === '';
-  });
+  const input = document.getElementById('userInput');
+  input.disabled = false;
+  input.value = '';
+  input.oninput = function() {
+    document.getElementById('sendBtn').disabled = this.value.trim() === '';
+  };
+  document.getElementById('sendBtn').disabled = true;
 
   callClaude(null);
 }
 
-// ─── MESSAGE UI ───────────────────────────────────────────────────────────────
+// ── CHECK-IN MESSAGES ────────────────────────────────────────────────────────
 function addMessage(role, text) {
-  const messages = document.getElementById('messages');
+  const container = document.getElementById('messages');
   const typing = document.getElementById('typingIndicator');
   const div = document.createElement('div');
-  div.className = `message ${role === 'assistant' ? 'coach' : 'user'}`;
+  div.className = 'message ' + (role === 'assistant' ? 'coach' : 'user');
   const label = document.createElement('div');
   label.className = 'message-label';
   label.textContent = role === 'assistant' ? 'Fern' : 'You';
@@ -1108,23 +733,47 @@ function addMessage(role, text) {
   bubble.textContent = text;
   div.appendChild(label);
   div.appendChild(bubble);
-  messages.insertBefore(div, typing);
-  messages.scrollTop = messages.scrollHeight;
+  container.insertBefore(div, typing);
+  container.scrollTop = container.scrollHeight;
 }
 
 function showTyping(show) {
   document.getElementById('typingIndicator').classList.toggle('visible', show);
-  document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+  const c = document.getElementById('messages');
+  c.scrollTop = c.scrollHeight;
 }
 
-function showToast(message, type = '') {
+// ── EXERCISE DETAIL MESSAGES ─────────────────────────────────────────────────
+function addExerciseMessage(role, text) {
+  const container = document.getElementById('exerciseMessages');
+  const typing = document.getElementById('exerciseTyping');
+  const div = document.createElement('div');
+  div.className = 'message ' + (role === 'assistant' ? 'coach' : 'user');
+  const label = document.createElement('div');
+  label.className = 'message-label';
+  label.textContent = role === 'assistant' ? 'Fern' : 'You';
+  const bubble = document.createElement('div');
+  bubble.className = 'message-bubble';
+  bubble.textContent = text;
+  div.appendChild(label);
+  div.appendChild(bubble);
+  container.insertBefore(div, typing);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showExerciseTyping(show) {
+  document.getElementById('exerciseTyping').classList.toggle('visible', show);
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(message, type) {
   const toast = document.getElementById('toast');
   toast.textContent = message;
-  toast.className = `toast visible ${type}`;
-  setTimeout(() => toast.className = 'toast', 3500);
+  toast.className = 'toast visible ' + (type || '');
+  setTimeout(function() { toast.className = 'toast'; }, 3500);
 }
 
-// ─── SEND ─────────────────────────────────────────────────────────────────────
+// ── SEND (CHECK-IN) ──────────────────────────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById('userInput');
   const text = input.value.trim();
@@ -1134,25 +783,27 @@ async function sendMessage() {
   document.getElementById('sendBtn').disabled = true;
   addMessage('user', text);
   conversationHistory.push({ role: 'user', content: text });
-
-  if (currentMode === 'workout') {
-    if (currentSetIdx === -1) {
-      // Waiting for notes
-      await handleNotesInput(text);
-    } else if (currentExerciseIdx !== null) {
-      // Logging a set
-      await handleWorkoutInput(text);
-    } else {
-      // No exercise selected — prompt them to tap one
-      addMessage('assistant', 'Tap an exercise on the card above to start logging it.');
-    }
-  } else {
-    await callClaude(text);
-  }
+  await callClaude(text);
 }
 
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+// ── SEND (EXERCISE) ──────────────────────────────────────────────────────────
+async function sendExerciseMessage() {
+  const input = document.getElementById('exerciseInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('exerciseSendBtn').disabled = true;
+  addExerciseMessage('user', text);
+  await handleSetInput(text);
+}
+
+function handleExerciseKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendExerciseMessage(); }
 }
 
 function autoResize(el) {
@@ -1160,130 +811,312 @@ function autoResize(el) {
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
-// ─── CLAUDE API ───────────────────────────────────────────────────────────────
-async function callClaude(userMessage, overrideSystem, overrideMessages) {
+// ── CLAUDE API (CHECK-IN) ────────────────────────────────────────────────────
+async function callClaude(userMessage) {
   showTyping(true);
-
-  let systemPrompt;
-  if (overrideSystem) {
-    systemPrompt = overrideSystem;
-  } else {
-    systemPrompt = currentMode === 'morning' ? MORNING_SYSTEM : EVENING_SYSTEM;
-  }
-
-  const messages = overrideMessages || conversationHistory;
-  const payload = messages.length > 0
-    ? messages
-    : [{ role: 'user', content: 'Hello, please begin the check-in.' }];
+  const systemPrompt = currentMode === 'morning' ? MORNING_SYSTEM : EVENING_SYSTEM;
+  const msgs = conversationHistory.length > 0
+    ? conversationHistory
+    : [{ role: 'user', content: 'Hello, please begin.' }];
 
   try {
-    const response = await fetch(CONFIG.API_BASE, {
+    const res = await fetch(CONFIG.API_BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'claude', system: systemPrompt, messages: payload })
+      body: JSON.stringify({ action: 'claude', system: systemPrompt, messages: msgs })
     });
+    const data = await res.json();
+    showTyping(false);
 
-    const data = await response.json();
     if (!data.content || !data.content[0]) {
-      showTyping(false);
-      showToast('API error: ' + (data.error?.message || JSON.stringify(data)), 'error');
+      showToast('API error: ' + (data.error && data.error.message ? data.error.message : JSON.stringify(data)), 'error');
       return;
     }
 
     const reply = data.content[0].text;
-    showTyping(false);
 
-    if (currentMode === 'workout' && reply.includes('WORKOUT_COMPLETE:')) {
-      const parts = reply.split('WORKOUT_COMPLETE:');
-      if (parts[0].trim()) {
-        addMessage('assistant', parts[0].trim());
-        conversationHistory.push({ role: 'assistant', content: parts[0].trim() });
-      }
-      try {
-        const workoutData = JSON.parse(parts[1].trim());
-        await handleWorkoutComplete(workoutData);
-      } catch (e) {
-        showToast('Error saving workout. Please try again.', 'error');
-        console.error(e);
-      }
-    } else if (reply.includes('CHECKIN_COMPLETE:')) {
+    if (reply.includes('CHECKIN_COMPLETE:')) {
       const parts = reply.split('CHECKIN_COMPLETE:');
-      if (parts[0].trim()) {
-        addMessage('assistant', parts[0].trim());
-        conversationHistory.push({ role: 'assistant', content: parts[0].trim() });
-      }
-      try {
-        const checkinData = JSON.parse(parts[1].trim());
-        await handleCheckinComplete(checkinData);
-      } catch (e) {
-        showToast('Error saving data. Please try again.', 'error');
-      }
+      if (parts[0].trim()) { addMessage('assistant', parts[0].trim()); }
+      try { await handleCheckinComplete(JSON.parse(parts[1].trim())); }
+      catch(e) { showToast('Error saving. Please try again.', 'error'); }
     } else {
       addMessage('assistant', reply);
       conversationHistory.push({ role: 'assistant', content: reply });
     }
-
-  } catch (err) {
+  } catch(err) {
     showTyping(false);
     showToast('Connection error.', 'error');
     console.error(err);
   }
 }
 
-// ─── COMPLETE HANDLERS ────────────────────────────────────────────────────────
+// ── CHECKIN COMPLETE ─────────────────────────────────────────────────────────
 async function handleCheckinComplete(data) {
   checkinComplete = true;
   document.getElementById('userInput').disabled = true;
   document.getElementById('sendBtn').disabled = true;
-  showToast('Saving to your sheet...', '');
+  showToast('Saving...', '');
   try {
     await writeCheckinToSheet(data);
     const messages = document.getElementById('messages');
     const typing = document.getElementById('typingIndicator');
     const div = document.createElement('div');
     div.className = 'message coach';
-    div.innerHTML = `
-      <div class="message-label">Fern</div>
-      <div class="success-bubble">
-        <div class="check">✓</div>
-        <p><strong>All logged!</strong> Your ${currentMode} check-in has been saved. See you ${currentMode === 'morning' ? 'tonight' : 'tomorrow morning'}! 💪</p>
-      </div>`;
+    div.innerHTML = '<div class="message-label">Fern</div><div class="success-bubble"><div class="check">✓</div><p><strong>All logged!</strong> Your ' + currentMode + ' check-in is saved. See you ' + (currentMode === 'morning' ? 'tonight' : 'tomorrow morning') + '!</p></div>';
     messages.insertBefore(div, typing);
     messages.scrollTop = messages.scrollHeight;
-    showToast('Saved to Google Sheets ✓', 'success');
-  } catch (err) {
+    showToast('Saved ✓', 'success');
+  } catch(err) {
     showToast('Could not save. Check console.', 'error');
     console.error(err);
   }
 }
 
-async function handleWorkoutComplete(workoutData) {
-  checkinComplete = true;
-  document.getElementById('userInput').disabled = true;
-  document.getElementById('sendBtn').disabled = true;
-  showToast('Saving workout to your sheet...', '');
+// ── WORKOUT FLOW ─────────────────────────────────────────────────────────────
+async function startWorkout() {
+  const dayName = WORKOUT_DAYS[selectedDate.getDay()];
+  if (!dayName) { showToast('No workout scheduled for this day.', ''); return; }
+
+  setBadge('workout');
+  showScreen('workoutScreen');
+  document.getElementById('workoutDayTitle').textContent = dayName;
+  document.getElementById('workoutProgress').textContent = 'Loading...';
+  document.getElementById('exerciseList').innerHTML = '';
+
   try {
-    await writeWorkoutToSheet(workoutData);
-    const messages = document.getElementById('messages');
-    const typing = document.getElementById('typingIndicator');
-    const div = document.createElement('div');
-    div.className = 'message coach';
-    div.innerHTML = `
-      <div class="message-label">Fern</div>
-      <div class="success-bubble">
-        <div class="check">✓</div>
-        <p><strong>Workout logged!</strong> All your sets have been saved to the training program sheet. Great work today! 🏋️</p>
-      </div>`;
-    messages.insertBefore(div, typing);
-    messages.scrollTop = messages.scrollHeight;
-    showToast('Workout saved ✓', 'success');
-  } catch (err) {
-    showToast('Could not save workout. Check console.', 'error');
+    const token = await getGoogleToken();
+    workoutExercises = await loadWorkout(token, dayName);
+    exerciseLogs = {};
+    workoutExercises.forEach(function(_, i) { exerciseLogs[i] = { sets: [], notes: '' }; });
+    renderExerciseList();
+  } catch(err) {
+    showToast('Could not load workout.', 'error');
     console.error(err);
   }
 }
 
-// ─── GOOGLE SHEETS ────────────────────────────────────────────────────────────
+function renderExerciseList() {
+  const list = document.getElementById('exerciseList');
+  const done = Object.values(exerciseLogs).filter(function(l) { return l.sets.length > 0; }).length;
+  document.getElementById('workoutProgress').textContent = done + '/' + workoutExercises.length + ' logged';
+  document.getElementById('finishBtn').disabled = done === 0;
+
+  list.innerHTML = '';
+  workoutExercises.forEach(function(e, idx) {
+    const log = exerciseLogs[idx];
+    const isDone = log.sets.length > 0;
+
+    const meta = [
+      e.sets ? e.sets + ' sets' : '',
+      e.reps ? e.reps + ' reps' : '',
+      e.rir ? 'RIR ' + e.rir : '',
+      e.tempo ? 'Tempo ' + e.tempo : ''
+    ].filter(Boolean).join(' · ');
+
+    const btn = document.createElement('button');
+    btn.className = 'exercise-row' + (isDone ? ' done' : '');
+    btn.onclick = function() { openExercise(idx); };
+
+    const setsDisplay = log.sets.map(function(s) {
+      return s.replace(/^Set \d[^:]*:\s*/, '').replace(/^Set \d[^:]*\s*—\s*[^:]+:\s*/i, '');
+    }).join(' / ');
+
+    btn.innerHTML =
+      '<div class="exercise-row-left">' +
+        '<div class="exercise-row-name">' + e.name +
+          (e.link ? ' <a href="' + e.link + '" target="_blank" onclick="event.stopPropagation()">▶ Video</a>' : '') +
+        '</div>' +
+        (meta ? '<div class="exercise-row-meta">' + meta + '</div>' : '') +
+        (e.prev
+          ? '<div class="exercise-row-prev">📊 Last week: ' + e.prev + '</div>'
+          : '<div class="exercise-row-prev none">✨ First time</div>') +
+        (isDone ? '<div class="exercise-row-logged">✓ ' + setsDisplay + '</div>' : '') +
+      '</div>' +
+      '<div class="exercise-row-right">' + (isDone ? '✓' : '›') + '</div>';
+
+    list.appendChild(btn);
+  });
+}
+
+function openExercise(idx) {
+  const e = workoutExercises[idx];
+  currentExerciseIdx = idx;
+  currentSetIdx = 0;
+
+  // Clear exercise messages
+  const container = document.getElementById('exerciseMessages');
+  const typing = document.getElementById('exerciseTyping');
+  while (container.firstChild && container.firstChild !== typing) {
+    container.removeChild(container.firstChild);
+  }
+
+  // Populate header
+  document.getElementById('detailName').textContent = e.name;
+
+  const meta = [
+    e.sets ? e.sets + ' sets' : '',
+    e.reps ? e.reps + ' reps' : '',
+    e.rir ? 'RIR ' + e.rir : '',
+    e.tempo ? 'Tempo ' + e.tempo : ''
+  ].filter(Boolean).join(' · ');
+  document.getElementById('detailMeta').innerHTML =
+    (meta ? '<span>' + meta + '</span>' : '') +
+    (e.link ? '<a href="' + e.link + '" target="_blank">▶ Watch video</a>' : '');
+
+  const prevEl = document.getElementById('detailPrev');
+  if (e.prev) {
+    prevEl.textContent = '📊 Last week: ' + e.prev;
+    prevEl.className = 'exercise-detail-prev';
+  } else {
+    prevEl.textContent = '✨ First time — no previous data';
+    prevEl.className = 'exercise-detail-prev none';
+  }
+
+  // Setup input
+  const input = document.getElementById('exerciseInput');
+  input.disabled = false;
+  input.value = '';
+  input.oninput = function() {
+    document.getElementById('exerciseSendBtn').disabled = this.value.trim() === '';
+  };
+  document.getElementById('exerciseSendBtn').disabled = true;
+
+  showScreen('exerciseScreen');
+
+  // Build set sequence and prompt first set
+  const seq = buildSetSequence(e);
+  e._setSequence = seq;
+
+  const existing = exerciseLogs[idx];
+  if (existing && existing.sets.length > 0) {
+    // Already has some sets — show them and continue
+    const logged = existing.sets.map(function(s) {
+      return s.replace(/^[^:]+:\s*/, '');
+    }).join(' / ');
+    addExerciseMessage('assistant', 'You already logged: ' + logged + '\n\nLog ' + seq[existing.sets.length] + ':');
+    currentSetIdx = existing.sets.length;
+  } else {
+    addExerciseMessage('assistant', 'Log ' + seq[0] + ':');
+  }
+
+  setTimeout(function() { input.focus(); }, 100);
+}
+
+function backToWorkout() {
+  showScreen('workoutScreen');
+  renderExerciseList();
+}
+
+function buildSetSequence(exercise) {
+  const setsStr = (exercise.sets || '1').toString().trim().toLowerCase();
+  const isSided = setsStr.includes('side');
+  const numSets = parseInt(setsStr) || 1;
+  const seq = [];
+  if (isSided) {
+    for (var s = 1; s <= numSets; s++) {
+      seq.push('Set ' + s + ' — Right side');
+      seq.push('Set ' + s + ' — Left side');
+    }
+  } else {
+    for (var s = 1; s <= numSets; s++) {
+      seq.push('Set ' + s);
+    }
+  }
+  return seq;
+}
+
+async function handleSetInput(text) {
+  const exercise = workoutExercises[currentExerciseIdx];
+  const seq = exercise._setSequence || [];
+  const log = exerciseLogs[currentExerciseIdx];
+
+  log.sets.push(seq[currentSetIdx] + ': ' + text);
+  currentSetIdx++;
+
+  const exerciseInput = document.getElementById('exerciseInput');
+
+  if (currentSetIdx < seq.length) {
+    // More sets
+    addExerciseMessage('assistant', 'Got it! Now log ' + seq[currentSetIdx] + ':');
+    exerciseInput.disabled = false;
+    document.getElementById('exerciseSendBtn').disabled = true;
+    setTimeout(function() { exerciseInput.focus(); }, 50);
+  } else {
+    // All sets done — ask for notes
+    addExerciseMessage('assistant', 'All sets logged! Any notes? (form, how it felt — or "none")');
+    exerciseInput.disabled = false;
+    document.getElementById('exerciseSendBtn').disabled = true;
+    currentSetIdx = -1; // waiting for notes
+    setTimeout(function() { exerciseInput.focus(); }, 50);
+  }
+
+  // Check if we were waiting for notes
+  if (currentSetIdx === -1 && log.sets.length > 0 && seq.length > 0 && log.sets.length >= seq.length) {
+    // Actually we just moved to notes state above — this block handles when notes come in
+  }
+}
+
+// Override to handle notes state
+const _origSend = sendExerciseMessage;
+document.addEventListener('DOMContentLoaded', function() {
+  // Redefine after load — handled inline via currentSetIdx === -1 check
+});
+
+// Patch handleSetInput to handle notes
+async function sendExerciseMessage() {
+  const input = document.getElementById('exerciseInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('exerciseSendBtn').disabled = true;
+  addExerciseMessage('user', text);
+
+  if (currentSetIdx === -1) {
+    // This is the notes response
+    const log = exerciseLogs[currentExerciseIdx];
+    log.notes = text.toLowerCase() === 'none' ? '' : text;
+    addExerciseMessage('assistant', 'Perfect! Tap "Back to Workout" when you\'re ready for the next exercise.');
+    document.getElementById('exerciseInput').disabled = true;
+    document.getElementById('exerciseSendBtn').disabled = true;
+    currentSetIdx = null;
+  } else {
+    await handleSetInput(text);
+  }
+}
+
+async function finishWorkout() {
+  const workoutData = workoutExercises.map(function(e, i) {
+    const log = exerciseLogs[i];
+    const sets = log.sets.map(function(s) { return s.replace(/^[^:]+:\s*/, ''); }).join(' / ');
+    return { name: e.name, sets: sets, notes: log.notes };
+  });
+
+  document.getElementById('finishBtn').disabled = true;
+  document.getElementById('finishBtn').textContent = 'Saving...';
+  showToast('Saving workout...', '');
+
+  try {
+    await writeWorkoutToSheet(workoutData);
+    showToast('Workout saved ✓', 'success');
+    document.getElementById('finishBtn').textContent = 'Saved ✓';
+
+    // Add a success note to the list
+    const list = document.getElementById('exerciseList');
+    const div = document.createElement('div');
+    div.style.cssText = 'padding:20px;text-align:center;color:var(--workout);font-size:14px;font-weight:300;';
+    div.textContent = '✓ Workout logged to your sheet!';
+    list.appendChild(div);
+  } catch(err) {
+    showToast('Could not save. Check console.', 'error');
+    document.getElementById('finishBtn').disabled = false;
+    document.getElementById('finishBtn').textContent = 'Save Workout';
+    console.error(err);
+  }
+}
+
+// ── GOOGLE SHEETS ────────────────────────────────────────────────────────────
 async function getGoogleToken() {
   if (googleToken && googleToken.expires > Date.now()) return googleToken.token;
   const res = await fetch(CONFIG.API_BASE, {
@@ -1298,25 +1131,25 @@ async function getGoogleToken() {
 }
 
 async function findDateRow(token) {
-  const dateStr = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}/${String(selectedDate.getFullYear()).slice(-2)}`;
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/Daily%20Tracker!A:A`;
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  const ds = (selectedDate.getMonth() + 1) + '/' + selectedDate.getDate() + '/' + String(selectedDate.getFullYear()).slice(-2);
+  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Daily%20Tracker!A:A';
+  const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
   const data = await res.json();
   if (!data.values) throw new Error('Could not read sheet');
-  for (let i = 0; i < data.values.length; i++) {
-    if ((data.values[i][0] || '').toString().trim() === dateStr) return i + 1;
+  for (var i = 0; i < data.values.length; i++) {
+    if ((data.values[i][0] || '').toString().trim() === ds) return i + 1;
   }
-  throw new Error(`No row found for date: ${dateStr}`);
+  throw new Error('No row found for date: ' + ds);
 }
 
 async function batchWrite(token, updates) {
-  const batchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values:batchUpdate`;
-  const res = await fetch(batchUrl, {
+  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values:batchUpdate';
+  const res = await fetch(url, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       valueInputOption: 'USER_ENTERED',
-      data: updates.map(u => ({ range: u.range, values: [[u.value]] }))
+      data: updates.map(function(u) { return { range: u.range, values: [[u.value]] }; })
     })
   });
   if (!res.ok) { const err = await res.json(); throw new Error(JSON.stringify(err)); }
@@ -1324,61 +1157,98 @@ async function batchWrite(token, updates) {
 
 async function writeCheckinToSheet(data) {
   const token = await getGoogleToken();
-  const rowNum = await findDateRow(token);
-
-  let updates = [];
+  const row = await findDateRow(token);
+  var updates = [];
   if (currentMode === 'morning') {
-    const notesVal = [
-      data.bedtime ? `Bedtime: ${data.bedtime}` : '',
-      data.sleepQuality ? `Sleep quality: ${data.sleepQuality}/10` : '',
-      data.energy ? `Energy: ${data.energy}/10` : '',
-      data.notes && data.notes.toLowerCase() !== 'none' ? data.notes : ''
+    const notes = [
+      data.bedtime ? 'Bedtime: ' + data.bedtime : '',
+      data.sleepQuality ? 'Sleep quality: ' + data.sleepQuality + '/10' : '',
+      data.energy ? 'Energy: ' + data.energy + '/10' : '',
+      (data.notes && data.notes.toLowerCase() !== 'none') ? data.notes : ''
     ].filter(Boolean).join(' | ');
     updates = [
-      { range: `Daily Tracker!${colLetter(COLUMNS.morningWeight)}${rowNum}`, value: data.weight },
-      { range: `Daily Tracker!${colLetter(COLUMNS.sleepDuration)}${rowNum}`, value: data.sleepDuration },
-      { range: `Daily Tracker!${colLetter(COLUMNS.notes)}${rowNum}`, value: notesVal }
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.morningWeight) + row, value: data.weight },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.sleepDuration) + row, value: data.sleepDuration },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.notes) + row, value: notes }
     ];
   } else {
-    const notesVal = data.notes && data.notes.toLowerCase() !== 'none' ? data.notes : '';
+    const notes = (data.notes && data.notes.toLowerCase() !== 'none') ? data.notes : '';
     updates = [
-      { range: `Daily Tracker!${colLetter(COLUMNS.protein)}${rowNum}`, value: data.protein },
-      { range: `Daily Tracker!${colLetter(COLUMNS.carbs)}${rowNum}`, value: data.carbs },
-      { range: `Daily Tracker!${colLetter(COLUMNS.fats)}${rowNum}`, value: data.fats },
-      { range: `Daily Tracker!${colLetter(COLUMNS.fiber)}${rowNum}`, value: data.fiber },
-      { range: `Daily Tracker!${colLetter(COLUMNS.calories)}${rowNum}`, value: data.calories },
-      { range: `Daily Tracker!${colLetter(COLUMNS.steps)}${rowNum}`, value: data.steps },
-      { range: `Daily Tracker!${colLetter(COLUMNS.cardio)}${rowNum}`, value: data.cardio },
-      { range: `Daily Tracker!${colLetter(COLUMNS.workoutCompleted)}${rowNum}`, value: data.workoutCompleted },
-      { range: `Daily Tracker!${colLetter(COLUMNS.notes)}${rowNum}`, value: notesVal }
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.protein) + row, value: data.protein },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.carbs) + row, value: data.carbs },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.fats) + row, value: data.fats },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.fiber) + row, value: data.fiber },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.calories) + row, value: data.calories },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.steps) + row, value: data.steps },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.cardio) + row, value: data.cardio },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.workoutCompleted) + row, value: data.workoutCompleted },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.notes) + row, value: notes }
     ];
   }
-
   await batchWrite(token, updates);
+}
+
+async function loadWorkout(token, dayName) {
+  const weekIdx = getWeekIndex(selectedDate);
+  const prevWeekIdx = weekIdx > 0 ? weekIdx - 1 : null;
+
+  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:Z';
+  const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+  const data = await res.json();
+  if (!data.values) throw new Error('Could not read Training Program');
+
+  const rows = data.values;
+  var inSection = false;
+  const exercises = [];
+  const skipNames = ['Exercise', 'Steps & Cardio', 'Daily Steps', 'Program Start Date'];
+
+  for (var i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const cellA = (row[0] || '').toString().trim();
+
+    if (cellA === dayName) { inSection = true; continue; }
+
+    if (inSection && cellA && (
+      cellA === 'Sunday: Lower' || cellA === 'Monday: Upper' ||
+      cellA === 'Tuesday: Lower' || cellA === 'Saturday: Upper' ||
+      cellA.includes('Warm-Up')
+    )) break;
+
+    if (!inSection || !cellA || skipNames.indexOf(cellA) !== -1) continue;
+
+    const prevCol = prevWeekIdx !== null ? weekCol(prevWeekIdx) : null;
+    const prev = prevCol !== null ? (row[prevCol] || '').toString().trim() : '';
+
+    exercises.push({
+      name: cellA,
+      link: (row[1] || '').toString().trim(),
+      sets: (row[2] || '').toString().trim(),
+      reps: (row[3] || '').toString().trim(),
+      rir: (row[4] || '').toString().trim(),
+      tempo: (row[5] || '').toString().trim(),
+      coachingNotes: (row[6] || '').toString().trim(),
+      prev: prev || null,
+      rowIndex: i + 1,
+      weekCol: weekCol(weekIdx),
+      notesCol: weekCol(weekIdx) + 1
+    });
+  }
+  return exercises;
 }
 
 async function writeWorkoutToSheet(workoutData) {
   const token = await getGoogleToken();
   const updates = [];
-
-  for (const logged of workoutData) {
-    // Find matching exercise in our loaded workout data
-    const exercise = workoutExercises.find(e => e.name === logged.name);
-    if (!exercise) continue;
+  workoutData.forEach(function(logged) {
+    const exercise = workoutExercises.find(function(e) { return e.name === logged.name; });
+    if (!exercise) return;
     if (logged.sets && logged.sets.trim()) {
-      updates.push({
-        range: `Training Program!${colLetter(exercise.weekCol)}${exercise.rowIndex}`,
-        value: logged.sets
-      });
+      updates.push({ range: 'Training Program!' + colLetter(exercise.weekCol) + exercise.rowIndex, value: logged.sets });
     }
     if (logged.notes && logged.notes.trim()) {
-      updates.push({
-        range: `Training Program!${colLetter(exercise.notesCol)}${exercise.rowIndex}`,
-        value: logged.notes
-      });
+      updates.push({ range: 'Training Program!' + colLetter(exercise.notesCol) + exercise.rowIndex, value: logged.notes });
     }
-  }
-
+  });
   if (updates.length > 0) await batchWrite(token, updates);
 }
 

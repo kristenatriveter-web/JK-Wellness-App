@@ -1100,9 +1100,7 @@ async function loadSessions(token) {
       continue;
     }
 
-    const isHeader = cellA && !cellB && !cellC &&
-      !(row[3] || '').trim() && !(row[4] || '').trim() &&
-      !(row[5] || '').trim() && !(row[6] || '').trim();
+    const isHeader = /upper|lower|full body/i.test(cellA);
 
     if (isHeader) {
       if (currentSession) {
@@ -1541,10 +1539,7 @@ async function loadWorkout(token, sessionName) {
     if (!cellA) break;
 
     // Another section header ends the session
-    const isHeader = cellA && !cellB && !cellC &&
-      !(row[3] || '').trim() && !(row[4] || '').trim() &&
-      !(row[5] || '').trim() && !(row[6] || '').trim();
-    if (isHeader) break;
+    if (/upper|lower|full body/i.test(cellA)) break;
 
     // Skip column header row
     if (cellA === 'Exercise') continue;

@@ -614,53 +614,56 @@ const CONFIG = {
 };
 
 const DAILY_COLS = {
-  morningWeight: 2,   // C
-  protein: 6,         // G
-  carbs: 7,           // H
-  fats: 8,            // I
-  fiber: 9,           // J
-  calories: 10,       // K
-  steps: 11,          // L
+  morningWeight: 2,     // C
+  avgWeight: 3,         // D
+  bodyFat: 4,           // E
+  muscleMass: 5,        // F
+  protein: 6,           // G
+  carbs: 7,             // H
+  fats: 8,              // I
+  fiber: 9,             // J
+  calories: 10,         // K
+  steps: 11,            // L
   workoutCompleted: 12, // M
-  bedtime: 13,        // N
-  sleepDuration: 14,  // O
-  sleepScore: 15,     // P
-  notes: 16           // Q
+  bedtime: 13,          // N
+  sleepDuration: 14,    // O
+  sleepScore: 15,       // P
+  notes: 16             // Q
 };
 
 // ── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
-const MORNING_SYSTEM = `You are Fern, a warm encouraging wellness coach for JK Wellness. Ask ONE question at a time. After each answer give a brief warm acknowledgment (1 sentence), then ask the next.
+const MORNING_SYSTEM = `You are Fern, a data collection assistant for JK Wellness. Ask ONE question at a time. After each answer, say "Thanks." then ask the next question. Do not editorialize, encourage, or comment on the answers.
 
-Questions:
+Questions to ask in this exact order:
 1. What time did you go to sleep last night?
-2. What's your weight this morning? (lbs)
-3. How many hours of sleep did you get?
-4. Sleep quality? (1-10)
-5. Energy today? (1-10)
-6. Any notes to start the day? (or "none")
+2. How many hours of sleep did you get?
+3. How would you rate your sleep quality? (1-10)
+4. What is your weight this morning in lbs?
+5. What is your body fat percentage this morning? (or "skip")
+6. What is your muscle mass this morning in lbs? (or "skip")
+7. Any notes for your coach? (or "none")
 
-When you have all 6 answers output EXACTLY:
-CHECKIN_COMPLETE:{"bedtime":"[answer]","weight":"[answer]","sleepDuration":"[answer]","sleepQuality":"[answer]","energy":"[answer]","notes":"[answer]"}
+When you have all 7 answers output EXACTLY:
+CHECKIN_COMPLETE:{"bedtime":"[answer]","sleepDuration":"[answer]","sleepQuality":"[answer]","weight":"[answer]","bodyFat":"[answer]","muscleMass":"[answer]","notes":"[answer]"}
 
-Begin by greeting the client warmly and asking question 1.`;
+Begin by saying "Morning check-in." then asking question 1.`;
 
-const EVENING_SYSTEM = `You are Fern, a warm encouraging wellness coach for JK Wellness. Ask ONE question at a time. After each answer give a brief warm acknowledgment (1 sentence), then ask the next.
+const EVENING_SYSTEM = `You are Fern, a data collection assistant for JK Wellness. Ask ONE question at a time. After each answer, say "Thanks." then ask the next question. Do not editorialize, encourage, or comment on the answers.
 
-Questions:
-1. Protein today? (grams)
-2. Carbs? (grams)
-3. Fat? (grams)
-4. Fiber? (grams)
-5. Total calories?
-6. Steps today?
-7. Any cardio? (what + how long, or "no")
-8. Did you complete a workout? (yes/no)
-9. Any notes or questions for your coach? (or "none")
+Questions to ask in this exact order:
+1. How much protein did you have today in grams?
+2. How many carbs in grams?
+3. How much fat in grams?
+4. How much fiber in grams?
+5. What were your total calories?
+6. How many steps did you get today?
+7. Did you complete a workout today? (yes/no)
+8. Any notes or questions for your coach? (or "none")
 
-When you have all 9 answers output EXACTLY:
-CHECKIN_COMPLETE:{"protein":"[answer]","carbs":"[answer]","fats":"[answer]","fiber":"[answer]","calories":"[answer]","steps":"[answer]","cardio":"[answer]","workoutCompleted":"[answer]","notes":"[answer]"}
+When you have all 8 answers output EXACTLY:
+CHECKIN_COMPLETE:{"protein":"[answer]","carbs":"[answer]","fats":"[answer]","fiber":"[answer]","calories":"[answer]","steps":"[answer]","workoutCompleted":"[answer]","notes":"[answer]"}
 
-Begin by greeting the client warmly and asking question 1.`;
+Begin by saying "Evening check-in." then asking question 1.`;
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let currentMode = null;
@@ -938,6 +941,7 @@ async function handleCheckinComplete(data) {
   showToast('Saving...', '');
   try {
     await writeCheckinToSheet(data);
+    console.log('Check-in write successful');
     const messages = document.getElementById('messages');
     const typing = document.getElementById('typingIndicator');
     const div = document.createElement('div');
@@ -947,8 +951,8 @@ async function handleCheckinComplete(data) {
     messages.scrollTop = messages.scrollHeight;
     showToast('Saved ✓', 'success');
   } catch(err) {
-    showToast('Could not save. Check console.', 'error');
-    console.error(err);
+    showToast('Error: ' + err.message, 'error');
+    console.error('Checkin save error:', err);
   }
 }
 
@@ -1190,7 +1194,7 @@ function exerciseAction() {
     input.placeholder = 'I, M, or D';
     input.value = '';
     document.getElementById('exerciseSendBtn').disabled = true;
-    addExerciseMessage('assistant', 'How did you perform vs last week?\n\nI = Increased\nM = Maintained\nD = Decreased');
+    addExerciseMessage('assistant', 'Performance vs last week: I (Increased), M (Maintained), or D (Decreased)?');
     setTimeout(function() { input.focus(); }, 100);
   }
 }
@@ -1223,7 +1227,7 @@ async function handleSetInput(text) {
   currentSetIdx = log.sets.length;
 
   const exerciseInput = document.getElementById('exerciseInput');
-  addExerciseMessage('assistant', 'Logged! Log another set or click Next.');
+  addExerciseMessage('assistant', 'Logged. Log another set or click Next.');
   exerciseInput.disabled = false;
   exerciseInput.value = '';
   document.getElementById('exerciseSendBtn').disabled = true;
@@ -1255,7 +1259,7 @@ async function sendExerciseMessage() {
       input.disabled = false;
       input.placeholder = 'Notes or questions for your coach...';
       document.getElementById('exerciseSendBtn').disabled = true;
-      addExerciseMessage('assistant', 'Got it — ' + letter + '. Any notes or questions for your coach? (or say "none")');
+      addExerciseMessage('assistant', 'Any notes or questions for your coach? (or "none")');
       setTimeout(function() { input.focus(); }, 100);
     } else {
       // Invalid IMD response
@@ -1271,7 +1275,7 @@ async function sendExerciseMessage() {
     currentSetIdx = null;
     input.disabled = true;
     document.getElementById('exerciseSendBtn').disabled = true;
-    addExerciseMessage('assistant', 'All logged! Tap "Done with this exercise" to go back.');
+    addExerciseMessage('assistant', 'Logged. Tap Done when ready.');
     const actionBtn = document.getElementById('exerciseActionBtn');
     if (actionBtn) { actionBtn.textContent = 'Done with this exercise'; actionBtn.setAttribute('data-state', 'done'); }
   } else {
@@ -1297,14 +1301,16 @@ async function getGoogleToken() {
 
 async function findDateRow(token) {
   const ds = (selectedDate.getMonth() + 1) + '/' + selectedDate.getDate() + '/' + String(selectedDate.getFullYear()).slice(-2);
-  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Daily%20Tracker!A:A';
+  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/daily%20tracker!A:A';
   const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
   const data = await res.json();
   if (!data.values) throw new Error('Could not read sheet');
+  console.log('Looking for date:', ds);
+  console.log('First 10 rows col A:', data.values.slice(0, 10).map(function(r) { return r[0]; }));
   for (var i = 0; i < data.values.length; i++) {
     if ((data.values[i][0] || '').toString().trim() === ds) return i + 1;
   }
-  throw new Error('No row found for date: ' + ds);
+  throw new Error('No row found for date: ' + ds + '. Available dates checked: ' + data.values.slice(0,5).map(function(r){return r[0];}).join(', '));
 }
 
 async function batchWrite(token, updates) {
@@ -1323,33 +1329,52 @@ async function batchWrite(token, updates) {
 async function writeCheckinToSheet(data) {
   const token = await getGoogleToken();
   const row = await findDateRow(token);
+
+  // Read existing notes cell to append rather than overwrite
+  const notesRange = 'daily tracker!' + colLetter(DAILY_COLS.notes) + row;
+  const existingRes = await fetch(
+    'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/' + encodeURIComponent(notesRange),
+    { headers: { Authorization: 'Bearer ' + token } }
+  );
+  const existingData = await existingRes.json();
+  const existingNotes = (existingData.values && existingData.values[0] && existingData.values[0][0]) || '';
+
   var updates = [];
+
   if (currentMode === 'morning') {
-    const energyNote = data.energy ? 'Energy: ' + data.energy + '/10' : '';
+    const newNote = data.notes && data.notes.toLowerCase() !== 'none' && data.notes.toLowerCase() !== 'skip' ? data.notes : '';
+    const combinedNotes = [existingNotes, newNote].filter(Boolean).join(' | ');
+
     updates = [
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.morningWeight) + row, value: data.weight },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.bedtime) + row, value: data.bedtime },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.sleepDuration) + row, value: data.sleepDuration },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.sleepScore) + row, value: data.sleepQuality },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.notes) + row, value: [energyNote, data.notes && data.notes.toLowerCase() !== 'none' ? data.notes : ''].filter(Boolean).join(' | ') }
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.bedtime) + row, value: data.bedtime },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.sleepDuration) + row, value: data.sleepDuration },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.sleepScore) + row, value: data.sleepQuality },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.morningWeight) + row, value: data.weight },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.notes) + row, value: combinedNotes }
     ];
+    if (data.bodyFat && data.bodyFat.toLowerCase() !== 'skip') {
+      updates.push({ range: 'daily tracker!' + colLetter(DAILY_COLS.bodyFat) + row, value: data.bodyFat });
+    }
+    if (data.muscleMass && data.muscleMass.toLowerCase() !== 'skip') {
+      updates.push({ range: 'daily tracker!' + colLetter(DAILY_COLS.muscleMass) + row, value: data.muscleMass });
+    }
   } else {
-    const notes = (data.notes && data.notes.toLowerCase() !== 'none') ? data.notes : '';
-    const workoutEntry = [
-      data.workoutCompleted && data.workoutCompleted.toLowerCase() !== 'no' ? data.workoutCompleted : '',
-      data.cardio && data.cardio.toLowerCase() !== 'no' ? data.cardio : ''
-    ].filter(Boolean).join(' + ') || 'No';
+    const newNote = (data.notes && data.notes.toLowerCase() !== 'none') ? data.notes : '';
+    const combinedNotes = [existingNotes, newNote].filter(Boolean).join(' | ');
+    const workoutEntry = data.workoutCompleted && data.workoutCompleted.toLowerCase() !== 'no' ? data.workoutCompleted : 'No';
+
     updates = [
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.protein) + row, value: data.protein },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.carbs) + row, value: data.carbs },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.fats) + row, value: data.fats },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.fiber) + row, value: data.fiber },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.calories) + row, value: data.calories },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.steps) + row, value: data.steps },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.workoutCompleted) + row, value: workoutEntry },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.notes) + row, value: notes }
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.protein) + row, value: data.protein },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.carbs) + row, value: data.carbs },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.fats) + row, value: data.fats },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.fiber) + row, value: data.fiber },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.calories) + row, value: data.calories },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.steps) + row, value: data.steps },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.workoutCompleted) + row, value: workoutEntry },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.notes) + row, value: combinedNotes }
     ];
   }
+
   await batchWrite(token, updates);
 }
 

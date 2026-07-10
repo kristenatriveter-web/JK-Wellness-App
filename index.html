@@ -1073,23 +1073,18 @@ async function startWorkout() {
 }
 
 async function loadSessions(token) {
-  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:G';
+  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:A';
   const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
   const data = await res.json();
-  console.log('Training Program response:', JSON.stringify(data).slice(0, 500));
   if (!data.values) throw new Error('Could not read Training Program');
 
   const rows = data.values;
-  console.log('Col A values:', rows.slice(0, 30).map(function(r,i) { return i + ': ' + (r[0]||'(empty)'); }));
   const sessions = [];
   var currentSession = null;
   var exerciseCount = 0;
 
   for (var i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    const cellA = (row[0] || '').toString().trim();
-    const cellB = (row[1] || '').toString().trim();
-    const cellC = (row[2] || '').toString().trim();
+    const cellA = ((rows[i] && rows[i][0]) || '').toString().trim();
 
     if (!cellA) {
       if (currentSession) {
@@ -1100,7 +1095,7 @@ async function loadSessions(token) {
       continue;
     }
 
-    const isHeader = /upper|lower|full body/i.test(cellA);
+    const isHeader = /upper|lower|full\s*body/i.test(cellA);
 
     if (isHeader) {
       if (currentSession) {
@@ -1108,12 +1103,14 @@ async function loadSessions(token) {
         exerciseCount = 0;
       }
       currentSession = cellA;
-    } else if (currentSession && cellA && cellA !== 'Exercise') {
+      exerciseCount = 0;
+    } else if (currentSession && cellA !== 'Exercise' && cellA !== 'Program Start Date' && cellA !== 'Adjustment Date' && cellA !== 'Week' && cellA !== 'Steps & Cardio' && cellA !== 'Daily Steps') {
       exerciseCount++;
     }
   }
 
   if (currentSession) sessions.push({ name: currentSession, exerciseCount: exerciseCount });
+  console.log('Sessions found:', sessions);
   return sessions;
 }
 

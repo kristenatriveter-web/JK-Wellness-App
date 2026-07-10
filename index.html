@@ -351,29 +351,6 @@
 
   .exercise-row.done .exercise-row-right { color: var(--workout); font-size: 16px; }
 
-  .finish-workout-wrap {
-    padding: 16px 20px 28px;
-    border-top: 1px solid var(--border);
-  }
-
-  .finish-btn {
-    width: 100%;
-    background: var(--workout);
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    padding: 14px;
-    font-family: 'Jost', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    letter-spacing: 0.04em;
-    transition: background 0.2s;
-  }
-
-  .finish-btn:hover { background: #4a7a5a; }
-  .finish-btn:disabled { background: var(--border); color: var(--text-dim); cursor: not-allowed; }
-
   /* ── EXERCISE DETAIL SCREEN ── */
   #exerciseScreen { flex-direction: column; }
 
@@ -597,9 +574,6 @@
     </div>
   </div>
   <div class="exercise-list" id="exerciseList"></div>
-  <div class="finish-workout-wrap">
-    <button class="finish-btn" id="finishBtn" onclick="finishWorkout()" disabled>Save Workout</button>
-  </div>
 </div>
 
 <!-- ── EXERCISE DETAIL ── -->
@@ -1056,7 +1030,6 @@ function renderExerciseList() {
   const list = document.getElementById('exerciseList');
   const done = Object.values(exerciseLogs).filter(function(l) { return l.sets.length > 0; }).length;
   document.getElementById('workoutProgress').textContent = done + '/' + workoutExercises.length + ' logged';
-  document.getElementById('finishBtn').disabled = done === 0;
 
   list.innerHTML = '';
   workoutExercises.forEach(function(e, idx) {
@@ -1176,7 +1149,29 @@ function openExercise(idx) {
   setTimeout(function() { input.focus(); }, 100);
 }
 
-function backToWorkout() {
+async function backToWorkout() {
+  // Save what's been logged so far
+  const workoutData = workoutExercises.map(function(e, i) {
+    const log = exerciseLogs[i];
+    if (!log.sets.length) return null;
+    const sets = log.sets.map(function(s) {
+      if (s.includes('Right side')) return 'R: ' + s.replace(/^[^:]+:\s*/, '');
+      if (s.includes('Left side')) return 'L: ' + s.replace(/^[^:]+:\s*/, '');
+      return s.replace(/^[^:]+:\s*/, '');
+    }).join(' / ');
+    return { name: e.name, sets: sets, imd: log.imd || '', notes: log.notes || '' };
+  }).filter(Boolean);
+
+  if (workoutData.length > 0) {
+    try {
+      await writeWorkoutToSheet(workoutData);
+      showToast('Saved ✓', 'success');
+    } catch(err) {
+      showToast('Could not save. Check console.', 'error');
+      console.error(err);
+    }
+  }
+
   showScreen('workoutScreen');
   renderExerciseList();
 }
@@ -1284,42 +1279,7 @@ async function sendExerciseMessage() {
   }
 }
 
-async function finishWorkout() {
-  const workoutData = workoutExercises.map(function(e, i) {
-    const log = exerciseLogs[i];
-    const sets = log.sets.map(function(s) {
-      // Preserve R/L side info: "Set 1 — Right side: 135x8" -> "R: 135x8"
-      //                         "Set 1 — Left side: 135x8"  -> "L: 135x8"
-      //                         "Set 1: 135x8"              -> "135x8"
-      if (s.includes('Right side')) return 'R: ' + s.replace(/^[^:]+:\s*/, '');
-      if (s.includes('Left side')) return 'L: ' + s.replace(/^[^:]+:\s*/, '');
-      return s.replace(/^[^:]+:\s*/, '');
-    }).join(' / ');
-    return { name: e.name, sets: sets, imd: log.imd || '', notes: log.notes || '' };
-  });
 
-  document.getElementById('finishBtn').disabled = true;
-  document.getElementById('finishBtn').textContent = 'Saving...';
-  showToast('Saving workout...', '');
-
-  try {
-    await writeWorkoutToSheet(workoutData);
-    showToast('Workout saved ✓', 'success');
-    document.getElementById('finishBtn').textContent = 'Saved ✓';
-
-    // Add a success note to the list
-    const list = document.getElementById('exerciseList');
-    const div = document.createElement('div');
-    div.style.cssText = 'padding:20px;text-align:center;color:var(--workout);font-size:14px;font-weight:300;';
-    div.textContent = '✓ Workout logged to your sheet!';
-    list.appendChild(div);
-  } catch(err) {
-    showToast('Could not save. Check console.', 'error');
-    document.getElementById('finishBtn').disabled = false;
-    document.getElementById('finishBtn').textContent = 'Save Workout';
-    console.error(err);
-  }
-}
 
 // ── GOOGLE SHEETS ────────────────────────────────────────────────────────────
 async function getGoogleToken() {

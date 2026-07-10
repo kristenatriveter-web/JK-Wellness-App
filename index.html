@@ -466,29 +466,8 @@
   .session-btn-arrow { color: var(--text-dim); font-size: 20px; }
 
   /* ── SET ACTION BUTTONS ── */
-  .set-action-btns {
-    display: flex;
-    gap: 10px;
-  }
-
-  .next-set-btn {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--workout-border);
-    border-radius: var(--radius-sm);
-    color: var(--workout);
-    font-family: 'Jost', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .next-set-btn:hover { background: var(--workout-dim); }
-
   .done-set-btn {
-    flex: 1;
+    width: 100%;
     background: var(--workout);
     border: none;
     border-radius: var(--radius-sm);
@@ -704,10 +683,7 @@
     </button>
   </div>
   <div class="done-exercise-wrap">
-    <div class="set-action-btns">
-      <button class="next-set-btn" onclick="nextSetPrompt()">Next Set</button>
-      <button class="done-set-btn" onclick="doneWithExercise()">Done</button>
-    </div>
+    <button class="done-set-btn" onclick="doneWithExercise()">Done with this exercise</button>
   </div>
 </div>
 
@@ -1256,21 +1232,6 @@ function backToWorkout() {
   renderExerciseList();
 }
 
-function nextSetPrompt() {
-  const exercise = workoutExercises[currentExerciseIdx];
-  if (!exercise) return;
-  const seq = exercise._setSequence || [];
-  const nextIdx = exerciseLogs[currentExerciseIdx].sets.length;
-  const label = seq[nextIdx] ? seq[nextIdx] : 'Next set';
-  addExerciseMessage('assistant', 'Log ' + label + ':');
-  const input = document.getElementById('exerciseInput');
-  input.disabled = false;
-  input.placeholder = 'e.g. 135x8';
-  input.value = '';
-  document.getElementById('exerciseSendBtn').disabled = true;
-  setTimeout(function() { input.focus(); }, 50);
-}
-
 function doneWithExercise() {
   // Show IMD buttons
   document.getElementById('imdWrap').classList.add('visible');
@@ -1320,34 +1281,16 @@ function buildSetSequence(exercise) {
 }
 
 async function handleSetInput(text) {
-  const exercise = workoutExercises[currentExerciseIdx];
-  const seq = exercise._setSequence || [];
   const log = exerciseLogs[currentExerciseIdx];
-
-  log.sets.push(seq[currentSetIdx] + ': ' + text);
-  currentSetIdx++;
+  log.sets.push('Set ' + (log.sets.length + 1) + ': ' + text);
+  currentSetIdx = log.sets.length;
 
   const exerciseInput = document.getElementById('exerciseInput');
-
-  if (currentSetIdx < seq.length) {
-    // More sets
-    addExerciseMessage('assistant', 'Got it! Now log ' + seq[currentSetIdx] + ':');
-    exerciseInput.disabled = false;
-    document.getElementById('exerciseSendBtn').disabled = true;
-    setTimeout(function() { exerciseInput.focus(); }, 50);
-  } else {
-    // All sets done — ask for notes
-    addExerciseMessage('assistant', 'All sets logged! Any notes or questions for your coach? (form cues, how it felt, questions — or "none")');
-    exerciseInput.disabled = false;
-    document.getElementById('exerciseSendBtn').disabled = true;
-    currentSetIdx = -1; // waiting for notes
-    setTimeout(function() { exerciseInput.focus(); }, 50);
-  }
-
-  // Check if we were waiting for notes
-  if (currentSetIdx === -1 && log.sets.length > 0 && seq.length > 0 && log.sets.length >= seq.length) {
-    // Actually we just moved to notes state above — this block handles when notes come in
-  }
+  addExerciseMessage('assistant', 'Logged! Log next set or tap Done.');
+  exerciseInput.disabled = false;
+  exerciseInput.value = '';
+  document.getElementById('exerciseSendBtn').disabled = true;
+  setTimeout(function() { exerciseInput.focus(); }, 50);
 }
 
 // Override to handle notes state

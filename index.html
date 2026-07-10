@@ -1080,43 +1080,14 @@ async function loadSessions(token) {
 
   const rows = data.values;
   const sessions = [];
-  var currentSession = null;
-  var exerciseCount = 0;
-  var blankCount = 0;
-
-  // Skip rows, non-exercise labels
-  const skipLabels = ['Exercise','Program Start Date','Adjustment Date','Week','Steps & Cardio','Daily Steps','Cardio Method','Timing','Frequency/Week','Minutes'];
 
   for (var i = 0; i < rows.length; i++) {
     const cellA = ((rows[i] && rows[i][0]) || '').toString().trim();
-
-    if (!cellA) {
-      blankCount++;
-      // Only end session after 2 consecutive blank rows (to handle single spacer rows)
-      if (currentSession && blankCount >= 2) {
-        sessions.push({ name: currentSession, exerciseCount: exerciseCount });
-        currentSession = null;
-        exerciseCount = 0;
-      }
-      continue;
-    }
-
-    blankCount = 0;
-    const isHeader = /upper|lower|full.?body/i.test(cellA);
-
-    if (isHeader) {
-      if (currentSession) {
-        sessions.push({ name: currentSession, exerciseCount: exerciseCount });
-        exerciseCount = 0;
-      }
-      currentSession = cellA;
-      exerciseCount = 0;
-    } else if (currentSession && skipLabels.indexOf(cellA) === -1) {
-      exerciseCount++;
+    if (/upper|lower|full.?body/i.test(cellA)) {
+      sessions.push({ name: cellA, exerciseCount: 0 });
     }
   }
 
-  if (currentSession && exerciseCount > 0) sessions.push({ name: currentSession, exerciseCount: exerciseCount });
   console.log('Sessions found:', JSON.stringify(sessions));
   return sessions;
 }

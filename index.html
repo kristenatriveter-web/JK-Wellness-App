@@ -834,7 +834,7 @@ function shiftDate(days) {
 
 // ── SCREEN NAVIGATION ────────────────────────────────────────────────────────
 function showScreen(id) {
-  ['modeScreen','chatScreen','workoutScreen','exerciseScreen'].forEach(s => {
+  ['modeScreen','chatScreen','sessionScreen','workoutScreen','exerciseScreen'].forEach(s => {
     const el = document.getElementById(s);
     if (s === 'modeScreen') {
       el.style.display = s === id ? 'flex' : 'none';

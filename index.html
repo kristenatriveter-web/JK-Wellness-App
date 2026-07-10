@@ -644,10 +644,10 @@ User: 7
 You: Thanks. How would you rate your sleep quality? (1-10)
 
 Questions in order:
-1. What time did you go to sleep last night?
-2. How many hours of sleep did you get?
-3. How would you rate your sleep quality? (1-10)
-4. What is your weight this morning in lbs?
+1. What time did you go to sleep last night? (or "skip")
+2. How many hours of sleep did you get? (or "skip")
+3. How would you rate your sleep quality? (1-10, or "skip")
+4. What is your weight this morning in lbs? (or "skip")
 5. What is your body fat percentage? (or "skip")
 6. What is your muscle mass in lbs? (or "skip")
 7. Any notes for your coach? (or "none")
@@ -669,13 +669,13 @@ User: 200
 You: Thanks. How much fat in grams?
 
 Questions in order:
-1. How much protein did you have today in grams?
-2. How many carbs in grams?
-3. How much fat in grams?
-4. How much fiber in grams?
-5. What were your total calories?
-6. How many steps did you get today?
-7. Did you complete a workout today? (yes/no)
+1. How much protein did you have today in grams? (or "skip")
+2. How many carbs in grams? (or "skip")
+3. How much fat in grams? (or "skip")
+4. How much fiber in grams? (or "skip")
+5. What were your total calories? (or "skip")
+6. How many steps did you get today? (or "skip")
+7. What workout did you do today, if any? (or "none")
 8. Any notes or questions for your coach? (or "none")
 
 After question 8 is answered, output ONLY:
@@ -964,7 +964,7 @@ async function handleCheckinComplete(data) {
     const typing = document.getElementById('typingIndicator');
     const div = document.createElement('div');
     div.className = 'message coach';
-    div.innerHTML = '<div class="message-label">Fern</div><div class="success-bubble"><div class="check">✓</div><p><strong>All logged!</strong> Your ' + currentMode + ' check-in is saved. See you ' + (currentMode === 'morning' ? 'tonight' : 'tomorrow morning') + '!</p></div>';
+    div.innerHTML = '<div class="message-label">Fern</div><div class="success-bubble"><div class="check">✓</div><p><strong>All logged!</strong> Your ' + currentMode + ' check-in is saved. See you soon!</p></div>';
     messages.insertBefore(div, typing);
     messages.scrollTop = messages.scrollHeight;
     showToast('Saved ✓', 'success');

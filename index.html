@@ -546,52 +546,9 @@
 
   /* ── DONE EXERCISE BUTTON ── */
   .done-exercise-wrap {
-    padding: 0 16px 8px;
+    padding: 10px 16px 24px;
     background: var(--bg);
-  }
-
-  .done-exercise-btn {
-    width: 100%;
-    background: none;
-    border: 1px solid var(--workout-border);
-    border-radius: var(--radius-sm);
-    color: var(--workout);
-    font-family: 'Jost', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 10px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .done-exercise-btn:hover { background: var(--workout-dim); }
-
-  /* ── BOTTOM BACK BUTTON ── */
-  .bottom-back-wrap {
-    padding: 16px 20px 28px;
     border-top: 1px solid var(--border);
-    background: var(--bg);
-  }
-
-  .bottom-back-btn {
-    background: var(--workout);
-    border: none;
-    border-radius: var(--radius);
-    color: white;
-    font-family: 'Jost', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    padding: 14px;
-    cursor: pointer;
-    width: 100%;
-    transition: background 0.2s;
-  }
-
-  .bottom-back-btn:hover {
-    background: #4a7a5a;
   }
 
   /* ── TOAST ── */
@@ -720,12 +677,6 @@
       <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>
   </div>
-  <div class="done-exercise-wrap">
-    <div class="set-action-btns">
-      <button class="next-set-btn" onclick="nextSetPrompt()">Next Set</button>
-      <button class="done-set-btn" onclick="doneWithExercise()">Done</button>
-    </div>
-  </div>
   <div class="imd-wrap" id="imdWrap">
     <div class="imd-label">How did you perform vs last week?</div>
     <div class="imd-buttons">
@@ -752,8 +703,11 @@
       <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
     </button>
   </div>
-  <div class="bottom-back-wrap">
-    <button class="bottom-back-btn" onclick="backToWorkout()">Done! Back to Full Workout</button>
+  <div class="done-exercise-wrap">
+    <div class="set-action-btns">
+      <button class="next-set-btn" onclick="nextSetPrompt()">Next Set</button>
+      <button class="done-set-btn" onclick="doneWithExercise()">Done</button>
+    </div>
   </div>
 </div>
 

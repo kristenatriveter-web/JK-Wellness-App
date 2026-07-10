@@ -836,21 +836,32 @@ function addMessage(role, text) {
   label.textContent = role === 'assistant' ? 'Fern' : 'You';
   const bubble = document.createElement('div');
   bubble.className = 'message-bubble';
-  bubble.textContent = text;
+  // In check-in mode, append (or skip) to any question that doesn't already have it
+  var displayText = text;
+  if (role === 'assistant' && (currentMode === 'morning' || currentMode === 'evening')) {
+    var lines = text.split('\n');
+    var lastLine = lines[lines.length - 1].trim();
+    if (lastLine.endsWith('?') && !lastLine.includes('skip') && !lastLine.includes('none')) {
+      lines[lines.length - 1] = lines[lines.length - 1].trimEnd() + ' (or "skip")';
+      displayText = lines.join('\n');
+    }
+  }
+  bubble.textContent = displayText;
   div.appendChild(label);
   div.appendChild(bubble);
   container.insertBefore(div, typing);
-  setTimeout(function() { container.scrollTop = container.scrollHeight; }, 50);
+  requestAnimationFrame(function() { container.scrollTop = container.scrollHeight; });
 }
 
 function showTyping(show) {
   document.getElementById('typingIndicator').classList.toggle('visible', show);
   const c = document.getElementById('messages');
-  setTimeout(function() { c.scrollTop = c.scrollHeight; }, 50);
+  requestAnimationFrame(function() { c.scrollTop = c.scrollHeight; });
 }
 
 // ── EXERCISE DETAIL MESSAGES ─────────────────────────────────────────────────
 function addExerciseMessage(role, text) {
+  const exContainer = document.getElementById('exerciseMessages');
   const container = document.getElementById('exerciseMessages');
   const typing = document.getElementById('exerciseTyping');
   const div = document.createElement('div');
@@ -864,7 +875,7 @@ function addExerciseMessage(role, text) {
   div.appendChild(label);
   div.appendChild(bubble);
   container.insertBefore(div, typing);
-  setTimeout(function() { container.scrollTop = container.scrollHeight; }, 50);
+  requestAnimationFrame(function() { container.scrollTop = container.scrollHeight; });
 }
 
 function showExerciseTyping(show) {
@@ -972,7 +983,7 @@ async function handleCheckinComplete(data) {
     div.className = 'message coach';
     div.innerHTML = '<div class="message-label">Fern</div><div class="success-bubble"><div class="check">✓</div><p><strong>All logged!</strong> Your ' + currentMode + ' check-in is saved. See you soon!</p></div>';
     messages.insertBefore(div, typing);
-    setTimeout(function() { messages.scrollTop = messages.scrollHeight; }, 50);
+    requestAnimationFrame(function() { messages.scrollTop = messages.scrollHeight; });
     showToast('Saved ✓', 'success');
   } catch(err) {
     showToast('Error: ' + err.message, 'error');

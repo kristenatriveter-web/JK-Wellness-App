@@ -1295,7 +1295,7 @@ async function finishWorkout() {
       if (s.includes('Left side')) return 'L: ' + s.replace(/^[^:]+:\s*/, '');
       return s.replace(/^[^:]+:\s*/, '');
     }).join(' / ');
-    return { name: e.name, sets: sets, notes: log.notes };
+    return { name: e.name, sets: sets, imd: log.imd || '', notes: log.notes || '' };
   });
 
   document.getElementById('finishBtn').disabled = true;
@@ -1492,9 +1492,12 @@ async function loadWorkout(token, sessionName) {
 async function writeWorkoutToSheet(workoutData) {
   const token = await getGoogleToken();
   const updates = [];
+  console.log('Writing workout data:', JSON.stringify(workoutData));
+  console.log('Exercises:', workoutExercises.map(function(e) { return { name: e.name, wCol: e.wCol, imdCol: e.imdCol, notesCol: e.notesCol, rowIndex: e.rowIndex }; }));
   workoutData.forEach(function(logged) {
     const exercise = workoutExercises.find(function(e) { return e.name === logged.name; });
-    if (!exercise) return;
+    if (!exercise) { console.log('No exercise found for:', logged.name); return; }
+    console.log('Writing', logged.name, '-> row', exercise.rowIndex, 'col', colLetter(exercise.wCol), 'sets:', logged.sets);
     if (logged.sets && logged.sets.trim()) {
       updates.push({ range: 'Training Program!' + colLetter(exercise.wCol) + exercise.rowIndex, value: logged.sets });
     }
@@ -1505,7 +1508,9 @@ async function writeWorkoutToSheet(workoutData) {
       updates.push({ range: 'Training Program!' + colLetter(exercise.notesCol) + exercise.rowIndex, value: logged.notes });
     }
   });
+  console.log('Updates to write:', JSON.stringify(updates));
   if (updates.length > 0) await batchWrite(token, updates);
+  else console.log('No updates to write!');
 }
 
 init();

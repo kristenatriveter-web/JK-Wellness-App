@@ -1178,15 +1178,7 @@ function backToWorkout() {
 }
 
 function doneWithExercise() {
-  // Ask IMD as a chat question
-  currentSetIdx = -2; // waiting for IMD
-  const input = document.getElementById('exerciseInput');
-  input.disabled = false;
-  input.placeholder = 'I, M, or D';
-  input.value = '';
-  document.getElementById('exerciseSendBtn').disabled = true;
-  addExerciseMessage('assistant', 'Nice work! How did you perform vs last week?\n\nI = Increased\nM = Maintained\nD = Decreased');
-  setTimeout(function() { input.focus(); }, 100);
+  backToWorkout();
 }
 
 function buildSetSequence(exercise) {

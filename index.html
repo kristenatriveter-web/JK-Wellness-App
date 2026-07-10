@@ -482,47 +482,6 @@
 
   .done-set-btn:hover { background: #4a7a5a; }
 
-  /* ── IMD BUTTONS ── */
-  .imd-wrap {
-    padding: 14px 16px;
-    background: var(--surface2);
-    border-top: 1px solid var(--border);
-    display: none;
-  }
-
-  .imd-wrap.visible { display: block; }
-
-  .imd-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 10px;
-  }
-
-  .imd-buttons { display: flex; gap: 8px; }
-
-  .imd-btn {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 8px;
-    cursor: pointer;
-    font-family: 'Jost', sans-serif;
-    text-align: center;
-    transition: all 0.15s;
-  }
-
-  .imd-btn:hover { border-color: var(--workout-border); background: var(--workout-dim); }
-
-  .imd-btn.selected { background: var(--workout); border-color: var(--workout); color: white; }
-
-  .imd-btn-letter { font-size: 18px; font-weight: 500; display: block; margin-bottom: 2px; }
-  .imd-btn-label { font-size: 10px; font-weight: 400; color: inherit; display: block; }
-  .imd-btn.selected .imd-btn-label { color: rgba(255,255,255,0.8); }
-
   /* ── DONE EXERCISE BUTTON ── */
   .done-exercise-wrap {
     padding: 10px 16px 24px;
@@ -656,23 +615,6 @@
       <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>
   </div>
-  <div class="imd-wrap" id="imdWrap">
-    <div class="imd-label">How did you perform vs last week?</div>
-    <div class="imd-buttons">
-      <button class="imd-btn" onclick="selectIMD('I')">
-        <span class="imd-btn-letter">I</span>
-        <span class="imd-btn-label">Increased</span>
-      </button>
-      <button class="imd-btn" onclick="selectIMD('M')">
-        <span class="imd-btn-letter">M</span>
-        <span class="imd-btn-label">Maintained</span>
-      </button>
-      <button class="imd-btn" onclick="selectIMD('D')">
-        <span class="imd-btn-letter">D</span>
-        <span class="imd-btn-label">Decreased</span>
-      </button>
-    </div>
-  </div>
   <div class="input-area">
     <div class="input-wrap">
       <textarea id="exerciseInput" placeholder="e.g. 135x8" rows="1"
@@ -698,9 +640,18 @@ const CONFIG = {
 };
 
 const DAILY_COLS = {
-  morningWeight: 1, protein: 6, carbs: 7, fats: 8,
-  fiber: 9, calories: 10, steps: 11, cardio: 12,
-  workoutCompleted: 13, sleepDuration: 14, notes: 15
+  morningWeight: 2,   // C
+  protein: 6,         // G
+  carbs: 7,           // H
+  fats: 8,            // I
+  fiber: 9,           // J
+  calories: 10,       // K
+  steps: 11,          // L
+  workoutCompleted: 12, // M
+  bedtime: 13,        // N
+  sleepDuration: 14,  // O
+  sleepScore: 15,     // P
+  notes: 16           // Q
 };
 
 // ── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
@@ -1190,10 +1141,6 @@ function openExercise(idx) {
     '<div>' + prevNote + '</div>';
   prevEl.className = e.prev ? 'exercise-detail-prev' : 'exercise-detail-prev none';
 
-  // Reset IMD panel
-  document.getElementById('imdWrap').classList.remove('visible');
-  document.querySelectorAll('.imd-btn').forEach(function(b) { b.classList.remove('selected'); });
-
   // Setup input
   const input = document.getElementById('exerciseInput');
   input.disabled = false;
@@ -1226,40 +1173,20 @@ function openExercise(idx) {
 }
 
 function backToWorkout() {
-  // Hide IMD panel
-  document.getElementById('imdWrap').classList.remove('visible');
   showScreen('workoutScreen');
   renderExerciseList();
 }
 
 function doneWithExercise() {
-  // Show IMD buttons
-  document.getElementById('imdWrap').classList.add('visible');
-  // Clear any selected IMD
-  document.querySelectorAll('.imd-btn').forEach(function(b) { b.classList.remove('selected'); });
-  // Disable input while selecting IMD
-  document.getElementById('exerciseInput').disabled = true;
+  // Ask IMD as a chat question
+  currentSetIdx = -2; // waiting for IMD
+  const input = document.getElementById('exerciseInput');
+  input.disabled = false;
+  input.placeholder = 'I, M, or D';
+  input.value = '';
   document.getElementById('exerciseSendBtn').disabled = true;
-  addExerciseMessage('assistant', 'How did you perform compared to last week?');
-}
-
-function selectIMD(letter) {
-  // Highlight selected button
-  document.querySelectorAll('.imd-btn').forEach(function(b) { b.classList.remove('selected'); });
-  event.currentTarget.classList.add('selected');
-
-  // Save IMD
-  exerciseLogs[currentExerciseIdx].imd = letter;
-
-  // Hide IMD panel, re-enable input, ask for notes
-  setTimeout(function() {
-    document.getElementById('imdWrap').classList.remove('visible');
-    document.getElementById('exerciseInput').disabled = false;
-    document.getElementById('exerciseInput').placeholder = 'Notes or questions for your coach...';
-    currentSetIdx = -1; // notes mode
-    addExerciseMessage('assistant', 'Got it — ' + letter + '. Any notes or questions for your coach? (or say "none")');
-    setTimeout(function() { document.getElementById('exerciseInput').focus(); }, 100);
-  }, 400);
+  addExerciseMessage('assistant', 'Nice work! How did you perform vs last week?\n\nI = Increased\nM = Maintained\nD = Decreased');
+  setTimeout(function() { input.focus(); }, 100);
 }
 
 function buildSetSequence(exercise) {
@@ -1309,14 +1236,32 @@ async function sendExerciseMessage() {
   document.getElementById('exerciseSendBtn').disabled = true;
   addExerciseMessage('user', text);
 
-  if (currentSetIdx === -1) {
-    // This is the notes response
+  if (currentSetIdx === -2) {
+    // IMD response
+    const letter = text.trim().toUpperCase();
+    if (letter === 'I' || letter === 'M' || letter === 'D') {
+      exerciseLogs[currentExerciseIdx].imd = letter;
+      currentSetIdx = -1; // now waiting for notes
+      input.disabled = false;
+      input.placeholder = 'Notes or questions for your coach...';
+      document.getElementById('exerciseSendBtn').disabled = true;
+      addExerciseMessage('assistant', 'Got it — ' + letter + '. Any notes or questions for your coach? (or say "none")');
+      setTimeout(function() { input.focus(); }, 100);
+    } else {
+      // Invalid IMD response
+      input.disabled = false;
+      document.getElementById('exerciseSendBtn').disabled = true;
+      addExerciseMessage('assistant', 'Please reply with I, M, or D.');
+      setTimeout(function() { input.focus(); }, 100);
+    }
+  } else if (currentSetIdx === -1) {
+    // Notes response
     const log = exerciseLogs[currentExerciseIdx];
     log.notes = text.toLowerCase() === 'none' ? '' : text;
-    addExerciseMessage('assistant', 'Perfect! Tap "Back to Workout" when you\'re ready for the next exercise.');
-    document.getElementById('exerciseInput').disabled = true;
-    document.getElementById('exerciseSendBtn').disabled = true;
     currentSetIdx = null;
+    input.disabled = true;
+    document.getElementById('exerciseSendBtn').disabled = true;
+    addExerciseMessage('assistant', 'Logged! Tap "Back to Workout" when ready.');
   } else {
     await handleSetInput(text);
   }
@@ -1403,19 +1348,20 @@ async function writeCheckinToSheet(data) {
   const row = await findDateRow(token);
   var updates = [];
   if (currentMode === 'morning') {
-    const notes = [
-      data.bedtime ? 'Bedtime: ' + data.bedtime : '',
-      data.sleepQuality ? 'Sleep quality: ' + data.sleepQuality + '/10' : '',
-      data.energy ? 'Energy: ' + data.energy + '/10' : '',
-      (data.notes && data.notes.toLowerCase() !== 'none') ? data.notes : ''
-    ].filter(Boolean).join(' | ');
+    const energyNote = data.energy ? 'Energy: ' + data.energy + '/10' : '';
     updates = [
       { range: 'Daily Tracker!' + colLetter(DAILY_COLS.morningWeight) + row, value: data.weight },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.bedtime) + row, value: data.bedtime },
       { range: 'Daily Tracker!' + colLetter(DAILY_COLS.sleepDuration) + row, value: data.sleepDuration },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.notes) + row, value: notes }
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.sleepScore) + row, value: data.sleepQuality },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.notes) + row, value: [energyNote, data.notes && data.notes.toLowerCase() !== 'none' ? data.notes : ''].filter(Boolean).join(' | ') }
     ];
   } else {
     const notes = (data.notes && data.notes.toLowerCase() !== 'none') ? data.notes : '';
+    const workoutEntry = [
+      data.workoutCompleted && data.workoutCompleted.toLowerCase() !== 'no' ? data.workoutCompleted : '',
+      data.cardio && data.cardio.toLowerCase() !== 'no' ? data.cardio : ''
+    ].filter(Boolean).join(' + ') || 'No';
     updates = [
       { range: 'Daily Tracker!' + colLetter(DAILY_COLS.protein) + row, value: data.protein },
       { range: 'Daily Tracker!' + colLetter(DAILY_COLS.carbs) + row, value: data.carbs },
@@ -1423,8 +1369,7 @@ async function writeCheckinToSheet(data) {
       { range: 'Daily Tracker!' + colLetter(DAILY_COLS.fiber) + row, value: data.fiber },
       { range: 'Daily Tracker!' + colLetter(DAILY_COLS.calories) + row, value: data.calories },
       { range: 'Daily Tracker!' + colLetter(DAILY_COLS.steps) + row, value: data.steps },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.cardio) + row, value: data.cardio },
-      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.workoutCompleted) + row, value: data.workoutCompleted },
+      { range: 'Daily Tracker!' + colLetter(DAILY_COLS.workoutCompleted) + row, value: workoutEntry },
       { range: 'Daily Tracker!' + colLetter(DAILY_COLS.notes) + row, value: notes }
     ];
   }

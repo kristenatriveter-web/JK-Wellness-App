@@ -625,7 +625,7 @@
     </button>
   </div>
   <div class="done-exercise-wrap">
-    <button class="done-set-btn" onclick="doneWithExercise()">Done with this exercise</button>
+    <button class="done-set-btn" id="exerciseActionBtn" onclick="exerciseAction()">Next</button>
   </div>
 </div>
 
@@ -1141,6 +1141,10 @@ function openExercise(idx) {
     '<div>' + prevNote + '</div>';
   prevEl.className = e.prev ? 'exercise-detail-prev' : 'exercise-detail-prev none';
 
+  // Reset action button
+  const actionBtn = document.getElementById('exerciseActionBtn');
+  if (actionBtn) { actionBtn.textContent = 'Next'; actionBtn.setAttribute('data-state', 'next'); actionBtn.onclick = exerciseAction; }
+
   // Setup input
   const input = document.getElementById('exerciseInput');
   input.disabled = false;
@@ -1177,6 +1181,25 @@ function backToWorkout() {
   renderExerciseList();
 }
 
+function exerciseAction() {
+  const btn = document.getElementById('exerciseActionBtn');
+  const state = btn.getAttribute('data-state') || 'next';
+
+  if (state === 'done') {
+    backToWorkout();
+  } else {
+    // "Next" clicked — ask IMD
+    currentSetIdx = -2;
+    const input = document.getElementById('exerciseInput');
+    input.disabled = false;
+    input.placeholder = 'I, M, or D';
+    input.value = '';
+    document.getElementById('exerciseSendBtn').disabled = true;
+    addExerciseMessage('assistant', 'How did you perform vs last week?\n\nI = Increased\nM = Maintained\nD = Decreased');
+    setTimeout(function() { input.focus(); }, 100);
+  }
+}
+
 function doneWithExercise() {
   backToWorkout();
 }
@@ -1205,7 +1228,7 @@ async function handleSetInput(text) {
   currentSetIdx = log.sets.length;
 
   const exerciseInput = document.getElementById('exerciseInput');
-  addExerciseMessage('assistant', 'Logged! Log next set or tap Done.');
+  addExerciseMessage('assistant', 'Logged! Log another set or click Next.');
   exerciseInput.disabled = false;
   exerciseInput.value = '';
   document.getElementById('exerciseSendBtn').disabled = true;
@@ -1253,7 +1276,9 @@ async function sendExerciseMessage() {
     currentSetIdx = null;
     input.disabled = true;
     document.getElementById('exerciseSendBtn').disabled = true;
-    addExerciseMessage('assistant', 'Logged! Tap "Back to Workout" when ready.');
+    addExerciseMessage('assistant', 'All logged! Tap "Done with this exercise" to go back.');
+    const actionBtn = document.getElementById('exerciseActionBtn');
+    if (actionBtn) { actionBtn.textContent = 'Done with this exercise'; actionBtn.setAttribute('data-state', 'done'); }
   } else {
     await handleSetInput(text);
   }

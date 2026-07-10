@@ -465,6 +465,44 @@
   .session-btn-count { font-size: 12px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
   .session-btn-arrow { color: var(--text-dim); font-size: 20px; }
 
+  /* ── SET ACTION BUTTONS ── */
+  .set-action-btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  .next-set-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--workout-border);
+    border-radius: var(--radius-sm);
+    color: var(--workout);
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .next-set-btn:hover { background: var(--workout-dim); }
+
+  .done-set-btn {
+    flex: 1;
+    background: var(--workout);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .done-set-btn:hover { background: #4a7a5a; }
+
   /* ── IMD BUTTONS ── */
   .imd-wrap {
     padding: 14px 16px;
@@ -683,7 +721,10 @@
     </div>
   </div>
   <div class="done-exercise-wrap">
-    <button class="done-exercise-btn" id="doneExerciseBtn" onclick="doneWithExercise()">Done with this exercise</button>
+    <div class="set-action-btns">
+      <button class="next-set-btn" onclick="nextSetPrompt()">Next Set</button>
+      <button class="done-set-btn" onclick="doneWithExercise()">Done</button>
+    </div>
   </div>
   <div class="imd-wrap" id="imdWrap">
     <div class="imd-label">How did you perform vs last week?</div>
@@ -723,7 +764,7 @@
 const CONFIG = {
   SHEET_ID: '1RHOAKGpJUNpMJOqygiDOdAWutlx3VzYxbITKgVT1Qi8',
   API_BASE: '/api/token',
-  PROGRAM_START: new Date(2026, 5, 15)  // June 15 2026
+  PROGRAM_START: new Date(2026, 5, 29)  // June 29 2026
 };
 
 const DAILY_COLS = {
@@ -1105,7 +1146,6 @@ function renderSessionList(sessions) {
     btn.innerHTML =
       '<div>' +
         '<div class="session-btn-name">' + s.name + '</div>' +
-        '<div class="session-btn-count">' + s.exerciseCount + ' exercises</div>' +
       '</div>' +
       '<div class="session-btn-arrow">›</div>';
     btn.onclick = function() { selectSession(s.name); };
@@ -1260,6 +1300,21 @@ function backToWorkout() {
   document.getElementById('imdWrap').classList.remove('visible');
   showScreen('workoutScreen');
   renderExerciseList();
+}
+
+function nextSetPrompt() {
+  const exercise = workoutExercises[currentExerciseIdx];
+  if (!exercise) return;
+  const seq = exercise._setSequence || [];
+  const nextIdx = exerciseLogs[currentExerciseIdx].sets.length;
+  const label = seq[nextIdx] ? seq[nextIdx] : 'Next set';
+  addExerciseMessage('assistant', 'Log ' + label + ':');
+  const input = document.getElementById('exerciseInput');
+  input.disabled = false;
+  input.placeholder = 'e.g. 135x8';
+  input.value = '';
+  document.getElementById('exerciseSendBtn').disabled = true;
+  setTimeout(function() { input.focus(); }, 50);
 }
 
 function doneWithExercise() {
@@ -1480,22 +1535,64 @@ async function writeCheckinToSheet(data) {
 }
 
 async function loadWorkout(token, sessionName) {
-  const weekIdx = getWeekIndex(selectedDate);
-  const prevWeekIdx = weekIdx > 0 ? weekIdx - 1 : null;
-
-  // weekCol = 7 + (weekIdx * 3): Weight x Reps
-  // weekCol+1: I,M,D
-  // weekCol+2: Notes
-  const wCol = 7 + (weekIdx * 3);
-  const prevWCol = prevWeekIdx !== null ? 7 + (prevWeekIdx * 3) : null;
-
-  // Read enough columns to cover many weeks (A through AZ)
+  // Read full sheet to find week columns from header row and exercises
   const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:AZ';
   const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
   const data = await res.json();
   if (!data.values) throw new Error('Could not read Training Program');
 
   const rows = data.values;
+
+  // Find the week column by scanning header rows for date ranges
+  // Week headers look like "6/29-7/5" or "7/6-7/12"
+  // Each week block has 3 columns: Weight x Reps, I,M,D, Notes
+  // We scan every row looking for a cell that contains a date range matching selectedDate
+  var wCol = null;
+  var prevWCol = null;
+  const selDate = new Date(selectedDate); selDate.setHours(0,0,0,0);
+
+  for (var i = 0; i < Math.min(rows.length, 15); i++) {
+    const row = rows[i];
+    for (var c = 7; c < row.length; c += 3) {
+      const cell = (row[c] || '').toString().trim();
+      if (!cell) continue;
+
+      // Try to parse a date range like "6/29-7/5" or "6/29 - 7/5" or "6/29 – 7/12"
+      const match = cell.replace(/\s/g, '').match(/(\d+)\/(\d+)[–\-](\d+)\/(\d+)/);
+      if (!match) continue;
+
+      const year = selDate.getFullYear();
+      const startM = parseInt(match[1]) - 1;
+      const startD = parseInt(match[2]);
+      const endM = parseInt(match[3]) - 1;
+      const endD = parseInt(match[4]);
+
+      var startDate = new Date(year, startM, startD);
+      var endDate = new Date(year, endM, endD);
+
+      // Handle year wrap (Dec->Jan)
+      if (endDate < startDate) endDate.setFullYear(year + 1);
+
+      startDate.setHours(0,0,0,0);
+      endDate.setHours(23,59,59,999);
+
+      if (selDate >= startDate && selDate <= endDate) {
+        wCol = c;
+        prevWCol = c >= 10 ? c - 3 : null;
+        console.log('Date matched:', cell, 'wCol:', colLetter(c), 'prevWCol:', prevWCol !== null ? colLetter(prevWCol) : 'none');
+        break;
+      }
+    }
+    if (wCol !== null) break;
+  }
+
+  // Fallback: if no date range matched, use last populated week column
+  if (wCol === null) {
+    console.log('No date range matched selected date, using column H as fallback');
+    wCol = 7;
+    prevWCol = null;
+  }
+
   var inSection = false;
   const exercises = [];
 
@@ -1505,18 +1602,10 @@ async function loadWorkout(token, sessionName) {
     const cellB = (row[1] || '').toString().trim();
     const cellC = (row[2] || '').toString().trim();
 
-    // Detect this session's header
     if (cellA === sessionName) { inSection = true; continue; }
-
     if (!inSection) continue;
-
-    // Blank row ends the session
     if (!cellA) break;
-
-    // Another section header ends the session
-    if (/upper|lower|full body/i.test(cellA)) break;
-
-    // Skip column header row
+    if (/upper|lower|full.?body/i.test(cellA) && cellA !== sessionName) break;
     if (cellA === 'Exercise') continue;
 
     const prev = prevWCol !== null ? (row[prevWCol] || '').toString().trim() : '';
@@ -1536,6 +1625,8 @@ async function loadWorkout(token, sessionName) {
       notesCol: wCol + 2
     });
   }
+
+  console.log('Exercises found:', exercises.length, exercises.map(function(e) { return e.name; }));
   return exercises;
 }
 

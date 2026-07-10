@@ -632,36 +632,43 @@ const DAILY_COLS = {
 };
 
 // ── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
-const MORNING_SYSTEM = `You are Fern, a data collection assistant. Your ONLY job is to ask the questions below, one at a time, and collect answers. 
+const MORNING_SYSTEM = `You are a data collection bot. Collect answers to 7 questions. Nothing else.
 
-STRICT RULES — you must follow these exactly:
-- After each answer, say only "Thanks." then immediately ask the next question
-- Do NOT add any other words, emojis, encouragement, comments, or reactions
-- Do NOT ask about energy level or anything not listed below
-- Do NOT use bold text or markdown formatting
+After each answer respond with ONLY: "Thanks. [next question]"
+No emojis. No encouragement. No commentary. No bold. No extra sentences.
 
-Questions to ask in this exact order:
+Example of correct behavior:
+User: 10pm
+You: Thanks. How many hours of sleep did you get?
+User: 7
+You: Thanks. How would you rate your sleep quality? (1-10)
+
+Questions in order:
 1. What time did you go to sleep last night?
 2. How many hours of sleep did you get?
 3. How would you rate your sleep quality? (1-10)
 4. What is your weight this morning in lbs?
-5. What is your body fat percentage this morning? (or say "skip")
-6. What is your muscle mass this morning in lbs? (or say "skip")
-7. Any notes for your coach? (or say "none")
+5. What is your body fat percentage? (or "skip")
+6. What is your muscle mass in lbs? (or "skip")
+7. Any notes for your coach? (or "none")
 
-When you have all 7 answers output EXACTLY this and nothing else:
+After question 7 is answered, output ONLY:
 CHECKIN_COMPLETE:{"bedtime":"[answer]","sleepDuration":"[answer]","sleepQuality":"[answer]","weight":"[answer]","bodyFat":"[answer]","muscleMass":"[answer]","notes":"[answer]"}
 
-Start by saying exactly: "Morning check-in. What time did you go to sleep last night?"`;
+Begin: "Morning check-in. What time did you go to sleep last night?"`;
 
-const EVENING_SYSTEM = `You are Fern, a data collection assistant. Your ONLY job is to ask the questions below, one at a time, and collect answers.
+const EVENING_SYSTEM = `You are a data collection bot. Collect answers to 8 questions. Nothing else.
 
-STRICT RULES — you must follow these exactly:
-- After each answer, say only "Thanks." then immediately ask the next question
-- Do NOT add any other words, emojis, encouragement, comments, or reactions
-- Do NOT use bold text or markdown formatting
+After each answer respond with ONLY: "Thanks. [next question]"
+No emojis. No encouragement. No commentary. No bold. No extra sentences.
 
-Questions to ask in this exact order:
+Example of correct behavior:
+User: 150
+You: Thanks. How many carbs in grams?
+User: 200
+You: Thanks. How much fat in grams?
+
+Questions in order:
 1. How much protein did you have today in grams?
 2. How many carbs in grams?
 3. How much fat in grams?
@@ -669,12 +676,12 @@ Questions to ask in this exact order:
 5. What were your total calories?
 6. How many steps did you get today?
 7. Did you complete a workout today? (yes/no)
-8. Any notes or questions for your coach? (or say "none")
+8. Any notes or questions for your coach? (or "none")
 
-When you have all 8 answers output EXACTLY this and nothing else:
+After question 8 is answered, output ONLY:
 CHECKIN_COMPLETE:{"protein":"[answer]","carbs":"[answer]","fats":"[answer]","fiber":"[answer]","calories":"[answer]","steps":"[answer]","workoutCompleted":"[answer]","notes":"[answer]"}
 
-Start by saying exactly: "Evening check-in. How much protein did you have today in grams?"`;
+Begin: "Evening check-in. How much protein did you have today in grams?"`;
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let currentMode = null;

@@ -231,7 +231,6 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    scroll-behavior: smooth;
   }
 
   .message { max-width: 84%; animation: fadeUp 0.2s ease; }
@@ -850,13 +849,13 @@ function addMessage(role, text) {
   div.appendChild(label);
   div.appendChild(bubble);
   container.insertBefore(div, typing);
-  requestAnimationFrame(function() { container.scrollTop = container.scrollHeight; });
+  requestAnimationFrame(function() { requestAnimationFrame(function() { container.scrollTop = container.scrollHeight; }); });
 }
 
 function showTyping(show) {
   document.getElementById('typingIndicator').classList.toggle('visible', show);
   const c = document.getElementById('messages');
-  requestAnimationFrame(function() { c.scrollTop = c.scrollHeight; });
+  requestAnimationFrame(function() { requestAnimationFrame(function() { c.scrollTop = c.scrollHeight; }); });
 }
 
 // ── EXERCISE DETAIL MESSAGES ─────────────────────────────────────────────────
@@ -875,7 +874,7 @@ function addExerciseMessage(role, text) {
   div.appendChild(label);
   div.appendChild(bubble);
   container.insertBefore(div, typing);
-  requestAnimationFrame(function() { container.scrollTop = container.scrollHeight; });
+  requestAnimationFrame(function() { requestAnimationFrame(function() { container.scrollTop = container.scrollHeight; }); });
 }
 
 function showExerciseTyping(show) {
@@ -983,7 +982,7 @@ async function handleCheckinComplete(data) {
     div.className = 'message coach';
     div.innerHTML = '<div class="message-label">Fern</div><div class="success-bubble"><div class="check">✓</div><p><strong>All logged!</strong> Your ' + currentMode + ' check-in is saved. See you soon!</p></div>';
     messages.insertBefore(div, typing);
-    requestAnimationFrame(function() { messages.scrollTop = messages.scrollHeight; });
+    requestAnimationFrame(function() { requestAnimationFrame(function() { messages.scrollTop = messages.scrollHeight; }); });
     showToast('Saved ✓', 'success');
   } catch(err) {
     showToast('Error: ' + err.message, 'error');

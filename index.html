@@ -433,6 +433,103 @@
   .success-bubble p { font-size: 14px; font-weight: 300; color: var(--text-muted); line-height: 1.5; }
   .success-bubble strong { color: var(--accent); font-weight: 500; }
 
+  /* ── SESSION SELECTION ── */
+  .session-list { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  .session-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Jost', sans-serif;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .session-btn:hover, .session-btn:active {
+    border-color: var(--workout-border);
+    box-shadow: 0 2px 12px rgba(90,138,106,0.1);
+  }
+
+  .session-btn-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .session-btn-count { font-size: 12px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
+  .session-btn-arrow { color: var(--text-dim); font-size: 20px; }
+
+  /* ── IMD BUTTONS ── */
+  .imd-wrap {
+    padding: 14px 16px;
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+
+  .imd-wrap.visible { display: block; }
+
+  .imd-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .imd-buttons { display: flex; gap: 8px; }
+
+  .imd-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 8px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    text-align: center;
+    transition: all 0.15s;
+  }
+
+  .imd-btn:hover { border-color: var(--workout-border); background: var(--workout-dim); }
+
+  .imd-btn.selected { background: var(--workout); border-color: var(--workout); color: white; }
+
+  .imd-btn-letter { font-size: 18px; font-weight: 500; display: block; margin-bottom: 2px; }
+  .imd-btn-label { font-size: 10px; font-weight: 400; color: inherit; display: block; }
+  .imd-btn.selected .imd-btn-label { color: rgba(255,255,255,0.8); }
+
+  /* ── DONE EXERCISE BUTTON ── */
+  .done-exercise-wrap {
+    padding: 0 16px 8px;
+    background: var(--bg);
+  }
+
+  .done-exercise-btn {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--workout-border);
+    border-radius: var(--radius-sm);
+    color: var(--workout);
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .done-exercise-btn:hover { background: var(--workout-dim); }
+
   /* ── BOTTOM BACK BUTTON ── */
   .bottom-back-wrap {
     padding: 16px 20px 28px;
@@ -548,6 +645,16 @@
   </div>
 </div>
 
+<!-- ── SESSION SELECTION ── -->
+<div id="sessionScreen" class="screen">
+  <div class="workout-header">
+    <div class="workout-header-top">
+      <span class="workout-day-title">Choose Your Workout</span>
+    </div>
+  </div>
+  <div class="session-list" id="sessionList"></div>
+</div>
+
 <!-- ── WORKOUT LIST ── -->
 <div id="workoutScreen" class="screen">
   <div class="workout-header">
@@ -573,6 +680,26 @@
   <div class="messages" id="exerciseMessages">
     <div class="typing-indicator" id="exerciseTyping">
       <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+  <div class="done-exercise-wrap">
+    <button class="done-exercise-btn" id="doneExerciseBtn" onclick="doneWithExercise()">Done with this exercise</button>
+  </div>
+  <div class="imd-wrap" id="imdWrap">
+    <div class="imd-label">How did you perform vs last week?</div>
+    <div class="imd-buttons">
+      <button class="imd-btn" onclick="selectIMD('I')">
+        <span class="imd-btn-letter">I</span>
+        <span class="imd-btn-label">Increased</span>
+      </button>
+      <button class="imd-btn" onclick="selectIMD('M')">
+        <span class="imd-btn-letter">M</span>
+        <span class="imd-btn-label">Maintained</span>
+      </button>
+      <button class="imd-btn" onclick="selectIMD('D')">
+        <span class="imd-btn-letter">D</span>
+        <span class="imd-btn-label">Decreased</span>
+      </button>
     </div>
   </div>
   <div class="input-area">
@@ -604,8 +731,6 @@ const DAILY_COLS = {
   fiber: 9, calories: 10, steps: 11, cardio: 12,
   workoutCompleted: 13, sleepDuration: 14, notes: 15
 };
-
-const WORKOUT_DAYS = { 0: 'Sunday: Lower', 1: 'Monday: Upper', 2: 'Tuesday: Lower', 6: 'Saturday: Upper' };
 
 // ── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
 const MORNING_SYSTEM = `You are Fern, a warm encouraging wellness coach for JK Wellness. Ask ONE question at a time. After each answer give a brief warm acknowledgment (1 sentence), then ask the next.
@@ -660,7 +785,7 @@ function goHome() {
   checkinComplete = false;
   setBadge(null);
   document.getElementById('modeScreen').style.display = 'flex';
-  ['chatScreen','workoutScreen','exerciseScreen'].forEach(function(s) {
+  ['chatScreen','sessionScreen','workoutScreen','exerciseScreen'].forEach(function(s) {
     document.getElementById(s).classList.remove('active');
   });
 }
@@ -734,7 +859,7 @@ function getWeekIndex(date) {
   return Math.max(0, Math.floor((d - start) / (7 * 24 * 60 * 60 * 1000)));
 }
 
-function weekCol(weekIdx) { return 7 + weekIdx * 2; }
+function weekCol(weekIdx) { return 7 + weekIdx * 3; }
 
 function colLetter(idx) {
   if (idx < 26) return String.fromCharCode(65 + idx);
@@ -933,20 +1058,97 @@ async function handleCheckinComplete(data) {
 
 // ── WORKOUT FLOW ─────────────────────────────────────────────────────────────
 async function startWorkout() {
-  const dayName = WORKOUT_DAYS[selectedDate.getDay()];
-  if (!dayName) { showToast('No workout scheduled for this day.', ''); return; }
-
   setBadge('workout');
+  showScreen('sessionScreen');
+  document.getElementById('sessionList').innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:14px;">Loading sessions...</div>';
+
+  try {
+    const token = await getGoogleToken();
+    const sessions = await loadSessions(token);
+    renderSessionList(sessions);
+  } catch(err) {
+    showToast('Could not load sessions.', 'error');
+    console.error(err);
+  }
+}
+
+async function loadSessions(token) {
+  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:G';
+  const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+  const data = await res.json();
+  if (!data.values) throw new Error('Could not read Training Program');
+
+  const rows = data.values;
+  const sessions = [];
+  var currentSession = null;
+  var exerciseCount = 0;
+
+  for (var i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const cellA = (row[0] || '').toString().trim();
+    const cellB = (row[1] || '').toString().trim();
+    const cellC = (row[2] || '').toString().trim();
+
+    if (!cellA) {
+      if (currentSession) {
+        sessions.push({ name: currentSession, exerciseCount: exerciseCount });
+        currentSession = null;
+        exerciseCount = 0;
+      }
+      continue;
+    }
+
+    const isHeader = cellA && !cellB && !cellC &&
+      !(row[3] || '').trim() && !(row[4] || '').trim() &&
+      !(row[5] || '').trim() && !(row[6] || '').trim();
+
+    if (isHeader) {
+      if (currentSession) {
+        sessions.push({ name: currentSession, exerciseCount: exerciseCount });
+        exerciseCount = 0;
+      }
+      currentSession = cellA;
+    } else if (currentSession && cellA && cellA !== 'Exercise') {
+      exerciseCount++;
+    }
+  }
+
+  if (currentSession) sessions.push({ name: currentSession, exerciseCount: exerciseCount });
+  return sessions;
+}
+
+function renderSessionList(sessions) {
+  const list = document.getElementById('sessionList');
+  if (sessions.length === 0) {
+    list.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:14px;">No sessions found in Training Program tab.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  sessions.forEach(function(s) {
+    const btn = document.createElement('button');
+    btn.className = 'session-btn';
+    btn.innerHTML =
+      '<div>' +
+        '<div class="session-btn-name">' + s.name + '</div>' +
+        '<div class="session-btn-count">' + s.exerciseCount + ' exercises</div>' +
+      '</div>' +
+      '<div class="session-btn-arrow">›</div>';
+    btn.onclick = function() { selectSession(s.name); };
+    list.appendChild(btn);
+  });
+}
+
+async function selectSession(sessionName) {
   showScreen('workoutScreen');
-  document.getElementById('workoutDayTitle').textContent = dayName;
+  document.getElementById('workoutDayTitle').textContent = sessionName;
   document.getElementById('workoutProgress').textContent = 'Loading...';
   document.getElementById('exerciseList').innerHTML = '';
 
   try {
     const token = await getGoogleToken();
-    workoutExercises = await loadWorkout(token, dayName);
+    workoutExercises = await loadWorkout(token, sessionName);
     exerciseLogs = {};
-    workoutExercises.forEach(function(_, i) { exerciseLogs[i] = { sets: [], notes: '' }; });
+    workoutExercises.forEach(function(_, i) { exerciseLogs[i] = { sets: [], imd: '', notes: '' }; });
     renderExerciseList();
   } catch(err) {
     showToast('Could not load workout.', 'error');
@@ -999,6 +1201,16 @@ function renderExerciseList() {
   });
 }
 
+function metaLine(e) {
+  const parts = [
+    e.sets ? e.sets + ' sets' : '',
+    e.reps ? e.reps + ' reps' : '',
+    e.rir ? 'RIR ' + e.rir : '',
+    e.tempo ? 'Tempo ' + e.tempo : ''
+  ].filter(Boolean);
+  return parts.length ? parts.join(' · ') : '';
+}
+
 function openExercise(idx) {
   const e = workoutExercises[idx];
   currentExerciseIdx = idx;
@@ -1014,28 +1226,33 @@ function openExercise(idx) {
   // Populate header
   document.getElementById('detailName').textContent = e.name;
 
-  const meta = [
+  const metaParts = [
     e.sets ? e.sets + ' sets' : '',
     e.reps ? e.reps + ' reps' : '',
     e.rir ? 'RIR ' + e.rir : '',
     e.tempo ? 'Tempo ' + e.tempo : ''
   ].filter(Boolean).join(' · ');
+
   document.getElementById('detailMeta').innerHTML =
-    (meta ? '<span>' + meta + '</span>' : '') +
-    (e.link ? '<a href="' + e.link + '" target="_blank">▶ Watch video</a>' : '');
+    (metaParts ? '<span>' + metaParts + '</span>' : '') +
+    (e.link ? ' <a href="' + e.link + '" target="_blank">▶ Watch video</a>' : '');
 
   const prevEl = document.getElementById('detailPrev');
-  if (e.prev) {
-    prevEl.textContent = '📊 Last week: ' + e.prev;
-    prevEl.className = 'exercise-detail-prev';
-  } else {
-    prevEl.textContent = '✨ First time — no previous data';
-    prevEl.className = 'exercise-detail-prev none';
-  }
+  const coachNote = e.coachingNotes ? '📝 ' + e.coachingNotes : '';
+  const prevNote = e.prev ? '📊 Last week: ' + e.prev : '✨ First time — no previous data';
+  prevEl.innerHTML =
+    (coachNote ? '<div style="margin-bottom:4px">' + coachNote + '</div>' : '') +
+    '<div>' + prevNote + '</div>';
+  prevEl.className = e.prev ? 'exercise-detail-prev' : 'exercise-detail-prev none';
+
+  // Reset IMD panel
+  document.getElementById('imdWrap').classList.remove('visible');
+  document.querySelectorAll('.imd-btn').forEach(function(b) { b.classList.remove('selected'); });
 
   // Setup input
   const input = document.getElementById('exerciseInput');
   input.disabled = false;
+  input.placeholder = 'e.g. 135x8';
   input.value = '';
   input.oninput = function() {
     document.getElementById('exerciseSendBtn').disabled = this.value.trim() === '';
@@ -1064,8 +1281,40 @@ function openExercise(idx) {
 }
 
 function backToWorkout() {
+  // Hide IMD panel
+  document.getElementById('imdWrap').classList.remove('visible');
   showScreen('workoutScreen');
   renderExerciseList();
+}
+
+function doneWithExercise() {
+  // Show IMD buttons
+  document.getElementById('imdWrap').classList.add('visible');
+  // Clear any selected IMD
+  document.querySelectorAll('.imd-btn').forEach(function(b) { b.classList.remove('selected'); });
+  // Disable input while selecting IMD
+  document.getElementById('exerciseInput').disabled = true;
+  document.getElementById('exerciseSendBtn').disabled = true;
+  addExerciseMessage('assistant', 'How did you perform compared to last week?');
+}
+
+function selectIMD(letter) {
+  // Highlight selected button
+  document.querySelectorAll('.imd-btn').forEach(function(b) { b.classList.remove('selected'); });
+  event.currentTarget.classList.add('selected');
+
+  // Save IMD
+  exerciseLogs[currentExerciseIdx].imd = letter;
+
+  // Hide IMD panel, re-enable input, ask for notes
+  setTimeout(function() {
+    document.getElementById('imdWrap').classList.remove('visible');
+    document.getElementById('exerciseInput').disabled = false;
+    document.getElementById('exerciseInput').placeholder = 'Notes or questions for your coach...';
+    currentSetIdx = -1; // notes mode
+    addExerciseMessage('assistant', 'Got it — ' + letter + '. Any notes or questions for your coach? (or say "none")');
+    setTimeout(function() { document.getElementById('exerciseInput').focus(); }, 100);
+  }, 400);
 }
 
 function buildSetSequence(exercise) {
@@ -1255,11 +1504,18 @@ async function writeCheckinToSheet(data) {
   await batchWrite(token, updates);
 }
 
-async function loadWorkout(token, dayName) {
+async function loadWorkout(token, sessionName) {
   const weekIdx = getWeekIndex(selectedDate);
   const prevWeekIdx = weekIdx > 0 ? weekIdx - 1 : null;
 
-  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:Z';
+  // weekCol = 7 + (weekIdx * 3): Weight x Reps
+  // weekCol+1: I,M,D
+  // weekCol+2: Notes
+  const wCol = 7 + (weekIdx * 3);
+  const prevWCol = prevWeekIdx !== null ? 7 + (prevWeekIdx * 3) : null;
+
+  // Read enough columns to cover many weeks (A through AZ)
+  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:AZ';
   const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
   const data = await res.json();
   if (!data.values) throw new Error('Could not read Training Program');
@@ -1267,37 +1523,45 @@ async function loadWorkout(token, dayName) {
   const rows = data.values;
   var inSection = false;
   const exercises = [];
-  const skipNames = ['Exercise', 'Steps & Cardio', 'Daily Steps', 'Program Start Date'];
 
   for (var i = 0; i < rows.length; i++) {
     const row = rows[i];
     const cellA = (row[0] || '').toString().trim();
+    const cellB = (row[1] || '').toString().trim();
+    const cellC = (row[2] || '').toString().trim();
 
-    if (cellA === dayName) { inSection = true; continue; }
+    // Detect this session's header
+    if (cellA === sessionName) { inSection = true; continue; }
 
-    if (inSection && cellA && (
-      cellA === 'Sunday: Lower' || cellA === 'Monday: Upper' ||
-      cellA === 'Tuesday: Lower' || cellA === 'Saturday: Upper' ||
-      cellA.includes('Warm-Up')
-    )) break;
+    if (!inSection) continue;
 
-    if (!inSection || !cellA || skipNames.indexOf(cellA) !== -1) continue;
+    // Blank row ends the session
+    if (!cellA) break;
 
-    const prevCol = prevWeekIdx !== null ? weekCol(prevWeekIdx) : null;
-    const prev = prevCol !== null ? (row[prevCol] || '').toString().trim() : '';
+    // Another section header ends the session
+    const isHeader = cellA && !cellB && !cellC &&
+      !(row[3] || '').trim() && !(row[4] || '').trim() &&
+      !(row[5] || '').trim() && !(row[6] || '').trim();
+    if (isHeader) break;
+
+    // Skip column header row
+    if (cellA === 'Exercise') continue;
+
+    const prev = prevWCol !== null ? (row[prevWCol] || '').toString().trim() : '';
 
     exercises.push({
       name: cellA,
-      link: (row[1] || '').toString().trim(),
-      sets: (row[2] || '').toString().trim(),
+      link: cellB,
+      sets: cellC,
       reps: (row[3] || '').toString().trim(),
       rir: (row[4] || '').toString().trim(),
       tempo: (row[5] || '').toString().trim(),
       coachingNotes: (row[6] || '').toString().trim(),
       prev: prev || null,
       rowIndex: i + 1,
-      weekCol: weekCol(weekIdx),
-      notesCol: weekCol(weekIdx) + 1
+      wCol: wCol,
+      imdCol: wCol + 1,
+      notesCol: wCol + 2
     });
   }
   return exercises;
@@ -1310,7 +1574,10 @@ async function writeWorkoutToSheet(workoutData) {
     const exercise = workoutExercises.find(function(e) { return e.name === logged.name; });
     if (!exercise) return;
     if (logged.sets && logged.sets.trim()) {
-      updates.push({ range: 'Training Program!' + colLetter(exercise.weekCol) + exercise.rowIndex, value: logged.sets });
+      updates.push({ range: 'Training Program!' + colLetter(exercise.wCol) + exercise.rowIndex, value: logged.sets });
+    }
+    if (logged.imd && logged.imd.trim()) {
+      updates.push({ range: 'Training Program!' + colLetter(exercise.imdCol) + exercise.rowIndex, value: logged.imd });
     }
     if (logged.notes && logged.notes.trim()) {
       updates.push({ range: 'Training Program!' + colLetter(exercise.notesCol) + exercise.rowIndex, value: logged.notes });

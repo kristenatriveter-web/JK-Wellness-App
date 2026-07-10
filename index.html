@@ -635,62 +635,32 @@ const DAILY_COLS = {
 };
 
 // ── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
-const MORNING_SYSTEM = `You are a data collection bot. Collect answers to 7 questions. Nothing else.
+// Morning questions in order
+const MORNING_QUESTIONS = [
+  { key: 'bedtime',      q: 'What time did you go to sleep last night?' },
+  { key: 'sleepDuration', q: 'How many hours of sleep did you get?' },
+  { key: 'sleepQuality', q: 'How would you rate your sleep quality? (1-10)' },
+  { key: 'weight',       q: 'What is your weight this morning in lbs?' },
+  { key: 'bodyFat',      q: 'What is your body fat percentage?' },
+  { key: 'muscleMass',   q: 'What is your muscle mass in lbs?' },
+  { key: 'notes',        q: 'Any notes for your coach?' }
+];
 
-RULE: Every question you ask must end with (or "skip"). Always include this on every question, no exceptions.
-After each answer respond with ONLY: "Thanks. [next question (or \"skip\")]"
-No emojis. No encouragement. No commentary. No bold. No extra sentences.
+const MORNING_SYSTEM = null; // not used — stateless flow handles morning
 
-Example of correct behavior:
-User: 10pm
-You: Thanks. How many hours of sleep did you get? (or "skip")
-User: 7
-You: Thanks. How would you rate your sleep quality? (1-10, or "skip")
-User: 8
-You: Thanks. What is your weight this morning in lbs? (or "skip")
+// Evening questions in order
+const EVENING_QUESTIONS = [
+  { key: 'protein',         q: 'How much protein did you have today in grams?' },
+  { key: 'carbs',           q: 'How many carbs in grams?' },
+  { key: 'fats',            q: 'How much fat in grams?' },
+  { key: 'fiber',           q: 'How much fiber in grams?' },
+  { key: 'calories',        q: 'What were your total calories?' },
+  { key: 'steps',           q: 'How many steps did you get today?' },
+  { key: 'workoutCompleted', q: 'What workout did you do today, if any?' },
+  { key: 'notes',           q: 'Any notes or questions for your coach?' }
+];
 
-Questions in order — each must include (or "skip") when asked:
-1. What time did you go to sleep last night? (or "skip")
-2. How many hours of sleep did you get? (or "skip")
-3. How would you rate your sleep quality? (1-10, or "skip")
-4. What is your weight this morning in lbs? (or "skip")
-5. What is your body fat percentage? (or "skip")
-6. What is your muscle mass in lbs? (or "skip")
-7. Any notes for your coach? (or "none" or "skip")
-
-After question 7 is answered, output ONLY:
-CHECKIN_COMPLETE:{"bedtime":"[answer]","sleepDuration":"[answer]","sleepQuality":"[answer]","weight":"[answer]","bodyFat":"[answer]","muscleMass":"[answer]","notes":"[answer]"}
-
-Begin: "Morning check-in. What time did you go to sleep last night? (or \"skip\")"`;
-
-const EVENING_SYSTEM = `You are a data collection bot. Collect answers to 8 questions. Nothing else.
-
-RULE: Every question you ask must end with (or "skip"). Always include this on every question, no exceptions.
-After each answer respond with ONLY: "Thanks. [next question (or \"skip\")]"
-No emojis. No encouragement. No commentary. No bold. No extra sentences.
-
-Example of correct behavior:
-User: 150
-You: Thanks. How many carbs in grams? (or "skip")
-User: 200
-You: Thanks. How much fat in grams? (or "skip")
-User: skip
-You: Thanks. How much fiber in grams? (or "skip")
-
-Questions in order — each must include (or "skip") when asked:
-1. How much protein did you have today in grams? (or "skip")
-2. How many carbs in grams? (or "skip")
-3. How much fat in grams? (or "skip")
-4. How much fiber in grams? (or "skip")
-5. What were your total calories? (or "skip")
-6. How many steps did you get today? (or "skip")
-7. What workout did you do today, if any? (or "skip")
-8. Any notes or questions for your coach? (or "skip")
-
-After question 8 is answered, output ONLY:
-CHECKIN_COMPLETE:{"protein":"[answer]","carbs":"[answer]","fats":"[answer]","fiber":"[answer]","calories":"[answer]","steps":"[answer]","workoutCompleted":"[answer]","notes":"[answer]"}
-
-Begin: "Evening check-in. How much protein did you have today in grams? (or \"skip\")"`;
+const EVENING_SYSTEM = null; // not used — stateless flow handles evening
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let currentMode = null;
@@ -702,6 +672,10 @@ let workoutExercises = [];
 let exerciseLogs = {};
 let currentExerciseIdx = null;
 let currentSetIdx = 0;
+// Stateless check-in state
+let checkinAnswers = {};
+let checkinQuestionIdx = 0;
+let checkinQuestions = [];
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 function goHome() {
@@ -825,7 +799,16 @@ function startCheckin(mode) {
   };
   document.getElementById('sendBtn').disabled = true;
 
-  setTimeout(function() { callClaude(null); }, 50);
+  // Initialize stateless check-in
+  checkinAnswers = {};
+  checkinQuestionIdx = 0;
+  checkinQuestions = currentMode === 'morning' ? MORNING_QUESTIONS : EVENING_QUESTIONS;
+
+  // Ask first question directly — no API call needed
+  const firstQ = checkinQuestions[0].q + ' (or "skip")';
+  const greeting = currentMode === 'morning' ? 'Morning check-in. ' : 'Evening check-in. ';
+  addMessage('assistant', greeting + firstQ);
+  setTimeout(function() { input.focus(); }, 100);
 }
 
 // ── CHECK-IN MESSAGES ────────────────────────────────────────────────────────
@@ -902,8 +885,23 @@ async function sendMessage() {
   input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
   addMessage('user', text);
-  conversationHistory.push({ role: 'user', content: text });
-  await callClaude(text);
+
+  // Store answer
+  const currentQ = checkinQuestions[checkinQuestionIdx];
+  checkinAnswers[currentQ.key] = text.toLowerCase() === 'skip' ? '' : text;
+  checkinQuestionIdx++;
+
+  if (checkinQuestionIdx < checkinQuestions.length) {
+    // Ask next question
+    const nextQ = checkinQuestions[checkinQuestionIdx].q + ' (or "skip")';
+    addMessage('assistant', 'Thanks. ' + nextQ);
+    document.getElementById('sendBtn').disabled = true;
+    setTimeout(function() { input.focus(); }, 50);
+  } else {
+    // All questions answered
+    addMessage('assistant', 'Thanks. Saving your check-in...');
+    await handleCheckinComplete(checkinAnswers);
+  }
 }
 
 function handleKey(e) {

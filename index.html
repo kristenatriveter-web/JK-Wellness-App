@@ -1368,6 +1368,25 @@ async function writeCheckinToSheet(data) {
   const token = await getGoogleToken();
   const row = await findDateRow(token);
 
+  // For morning: sleep data goes to previous day's row, body metrics to today
+  var prevRow = null;
+  if (currentMode === 'morning') {
+    const prevDate = new Date(selectedDate);
+    prevDate.setDate(prevDate.getDate() - 1);
+    const prevDs = (prevDate.getMonth() + 1) + '/' + prevDate.getDate() + '/' + String(prevDate.getFullYear()).slice(-2);
+    const colAUrl = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/daily%20tracker!A:A';
+    const colARes = await fetch(colAUrl, { headers: { Authorization: 'Bearer ' + token } });
+    const colAData = await colARes.json();
+    if (colAData.values) {
+      for (var i = 0; i < colAData.values.length; i++) {
+        if ((colAData.values[i][0] || '').toString().trim() === prevDs) {
+          prevRow = i + 1;
+          break;
+        }
+      }
+    }
+  }
+
   // Read existing notes cell to append rather than overwrite
   const notesRange = 'daily tracker!' + colLetter(DAILY_COLS.notes) + row;
   const existingRes = await fetch(
@@ -1383,11 +1402,14 @@ async function writeCheckinToSheet(data) {
     const newNote = data.notes && data.notes.toLowerCase() !== 'none' && data.notes.toLowerCase() !== 'skip' ? data.notes : '';
     const combinedNotes = [existingNotes, newNote].filter(Boolean).join(' | ');
 
+    // Sleep data → previous day's row (if found), otherwise today
+    const sleepRow = prevRow || row;
     updates = [
-      { range: 'daily tracker!' + colLetter(DAILY_COLS.bedtime) + row, value: data.bedtime },
-      { range: 'daily tracker!' + colLetter(DAILY_COLS.sleepDuration) + row, value: data.sleepDuration },
-      { range: 'daily tracker!' + colLetter(DAILY_COLS.sleepScore) + row, value: data.sleepQuality },
-      { range: 'daily tracker!' + colLetter(DAILY_COLS.morningWeight) + row, value: data.weight },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.bedtime) + sleepRow, value: data.bedtime && data.bedtime !== 'skip' ? data.bedtime : '' },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.sleepDuration) + sleepRow, value: data.sleepDuration && data.sleepDuration !== 'skip' ? data.sleepDuration : '' },
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.sleepScore) + sleepRow, value: data.sleepQuality && data.sleepQuality !== 'skip' ? data.sleepQuality : '' },
+      // Body metrics → today's row
+      { range: 'daily tracker!' + colLetter(DAILY_COLS.morningWeight) + row, value: data.weight && data.weight !== 'skip' ? data.weight : '' },
       { range: 'daily tracker!' + colLetter(DAILY_COLS.notes) + row, value: combinedNotes }
     ];
     if (data.bodyFat && data.bodyFat.toLowerCase() !== 'skip') {

@@ -611,8 +611,8 @@
 
 
   <button class="mode-btn workout" onclick="startWorkout()">
-    <div class="btn-label">💪 Workout</div>
-    <div class="btn-title">Log Workout</div>
+    <div class="btn-label">💪</div>
+    <div class="btn-title">Workout!</div>
     <div class="btn-desc">View today's program &amp; log sets</div>
     <div class="btn-arrow">›</div>
   </button>
@@ -1076,9 +1076,11 @@ async function loadSessions(token) {
   const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:G';
   const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
   const data = await res.json();
+  console.log('Training Program response:', JSON.stringify(data).slice(0, 500));
   if (!data.values) throw new Error('Could not read Training Program');
 
   const rows = data.values;
+  console.log('Col A values:', rows.slice(0, 30).map(function(r,i) { return i + ': ' + (r[0]||'(empty)'); }));
   const sessions = [];
   var currentSession = null;
   var exerciseCount = 0;

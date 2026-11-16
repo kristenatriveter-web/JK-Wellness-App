@@ -1100,7 +1100,7 @@ function renderExerciseList() {
         '</div>' +
         (meta ? '<div class="exercise-row-meta">' + meta + '</div>' : '') +
         (e.prev
-          ? '<div class="exercise-row-prev">📊 Last week: ' + e.prev + '</div>'
+          ? '<div class="exercise-row-prev">📊 Week of ' + e.prevLabel + ': ' + e.prev + '</div>'
           : '<div class="exercise-row-prev none">✨ First time</div>') +
         (isDone ? '<div class="exercise-row-logged">✓ ' + setsDisplay + '</div>' : '') +
       '</div>' +
@@ -1148,7 +1148,7 @@ function openExercise(idx) {
 
   const prevEl = document.getElementById('detailPrev');
   const coachNote = e.coachingNotes ? '📝 ' + e.coachingNotes : '';
-  const prevNote = e.prev ? '📊 Last week: ' + e.prev : '✨ First time — no previous data';
+  const prevNote = e.prev ? '📊 Week of ' + e.prevLabel + ': ' + e.prev : '✨ First time — no previous data';
   prevEl.innerHTML =
     (coachNote ? '<div style="margin-bottom:4px">' + coachNote + '</div>' : '') +
     '<div>' + prevNote + '</div>';
@@ -1580,7 +1580,14 @@ async function loadWorkout(token, sessionName) {
     if (cellA === 'Exercise') continue;
 
     var prev = '';
-    for (var pi = 0; pi < prevCols.length && !prev; pi++) prev = (row[prevCols[pi]] || '').toString().trim();
+    var prevLabel = '';
+    for (var pi = 0; pi < prevCols.length && !prev; pi++) {
+      prev = (row[prevCols[pi]] || '').toString().trim();
+      if (prev) {
+        const pb = blocks[prevCols[pi]];
+        prevLabel = pb ? (pb.sm + 1) + '/' + pb.sd : colLetter(prevCols[pi]);
+      }
+    }
 
     exercises.push({
       name: cellA,
@@ -1591,6 +1598,7 @@ async function loadWorkout(token, sessionName) {
       tempo: (row[5] || '').toString().trim(),
       coachingNotes: (row[6] || '').toString().trim(),
       prev: prev || null,
+      prevLabel: prevLabel,
       rowIndex: i + 1,
       wCol: wCol,
       imdCol: wCol + 1,

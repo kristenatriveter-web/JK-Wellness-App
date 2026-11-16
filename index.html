@@ -1349,7 +1349,65 @@ async function findDateRow(token) {
   throw new Error('No row found for date: ' + ds + '. Available dates checked: ' + data.values.slice(0,5).map(function(r){return r[0];}).join(', '));
 }
 
+async function ensureSheetColumns(token, sheetName, minColumns) {
+  // Get sheet metadata to check current column count
+  const metaUrl = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '?fields=sheets(properties)';
+  const metaRes = await fetch(metaUrl, { headers: { Authorization: 'Bearer ' + token } });
+  const metaData = await metaRes.json();
+  
+  const sheet = metaData.sheets && metaData.sheets.find(function(s) {
+    return s.properties.title === sheetName;
+  });
+  
+  if (!sheet) return;
+  
+  const currentCols = sheet.properties.gridProperties.columnCount;
+  const sheetId = sheet.properties.sheetId;
+  
+  if (currentCols < minColumns) {
+    console.log('Extending sheet columns from', currentCols, 'to', minColumns);
+    await fetch('https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + ':batchUpdate', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requests: [{
+          updateSheetProperties: {
+            properties: {
+              sheetId: sheetId,
+              gridProperties: { columnCount: minColumns }
+            },
+            fields: 'gridProperties.columnCount'
+          }
+        }]
+      })
+    });
+  }
+}
+
 async function batchWrite(token, updates) {
+  // Find max column index needed across all updates
+  var maxColIdx = 0;
+  var sheetName = null;
+  updates.forEach(function(u) {
+    const match = u.range.match(/^([^!]+)!/);
+    if (match) sheetName = match[1];
+    const colMatch = u.range.match(/!([A-Z]+)/);
+    if (colMatch) {
+      const letters = colMatch[1];
+      var idx = 0;
+      for (var i = 0; i < letters.length; i++) {
+        idx = idx * 26 + (letters.charCodeAt(i) - 64);
+      }
+      maxColIdx = Math.max(maxColIdx, idx);
+    }
+  });
+  
+  // Ensure sheet has enough columns (add 10 buffer)
+  if (sheetName) {
+    try { await ensureSheetColumns(token, sheetName, maxColIdx + 10); } 
+    catch(e) { console.log('Could not extend columns:', e.message); }
+  }
+
   const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values:batchUpdate';
   const res = await fetch(url, {
     method: 'POST',
@@ -1438,7 +1496,7 @@ async function writeCheckinToSheet(data) {
 
 async function loadWorkout(token, sessionName) {
   // Read full sheet to find week columns from header row and exercises
-  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:AZ';
+  const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + CONFIG.SHEET_ID + '/values/Training%20Program!A:BZ';
   const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
   const data = await res.json();
   if (!data.values) throw new Error('Could not read Training Program');
@@ -1449,51 +1507,62 @@ async function loadWorkout(token, sessionName) {
   // Week headers look like "6/29-7/5" or "7/6-7/12"
   // Each week block has 3 columns: Weight x Reps, I,M,D, Notes
   // We scan every row looking for a cell that contains a date range matching selectedDate
-  var wCol = null;
-  var prevWCol = null;
   const selDate = new Date(selectedDate); selDate.setHours(0,0,0,0);
 
-  for (var i = 0; i < Math.min(rows.length, 15); i++) {
+  // Collect every week-header (date range) in the first 20 rows, any column from H onward
+  const blocks = {};
+  const rangeRe = /(\d{1,2})\/(\d{1,2})(?:\/\d{2,4})?\s*(?:[\u2013\u2014\-]|to)\s*(\d{1,2})\/(\d{1,2})/i;
+  for (var i = 0; i < Math.min(rows.length, 20); i++) {
     const row = rows[i];
-    for (var c = 7; c < row.length; c += 3) {
+    for (var c = 7; c < row.length; c++) {
       const cell = (row[c] || '').toString().trim();
-      if (!cell) continue;
+      if (!cell || blocks[c]) continue;
+      const m = cell.match(rangeRe);
+      if (!m) continue;
+      blocks[c] = { col: c, sm: parseInt(m[1]) - 1, sd: parseInt(m[2]), em: parseInt(m[3]) - 1, ed: parseInt(m[4]), label: cell };
+    }
+  }
+  const blockList = Object.keys(blocks).map(function(k) { return blocks[k]; }).sort(function(a, b) { return a.col - b.col; });
 
-      // Try to parse a date range like "6/29-7/5" or "6/29 - 7/5" or "6/29 – 7/12"
-      const match = cell.replace(/\s/g, '').match(/(\d+)\/(\d+)[–\-](\d+)\/(\d+)/);
-      if (!match) continue;
+  function rangeFor(b, year) {
+    const st = new Date(year, b.sm, b.sd); st.setHours(0,0,0,0);
+    const en = new Date(year, b.em, b.ed); en.setHours(23,59,59,999);
+    if (en < st) en.setFullYear(year + 1);
+    return { st: st, en: en };
+  }
 
-      const year = selDate.getFullYear();
-      const startM = parseInt(match[1]) - 1;
-      const startD = parseInt(match[2]);
-      const endM = parseInt(match[3]) - 1;
-      const endD = parseInt(match[4]);
-
-      var startDate = new Date(year, startM, startD);
-      var endDate = new Date(year, endM, endD);
-
-      // Handle year wrap (Dec->Jan)
-      if (endDate < startDate) endDate.setFullYear(year + 1);
-
-      startDate.setHours(0,0,0,0);
-      endDate.setHours(23,59,59,999);
-
-      if (selDate >= startDate && selDate <= endDate) {
-        wCol = c;
-        prevWCol = c >= 10 ? c - 3 : null;
-        console.log('Date matched:', cell, 'wCol:', colLetter(c), 'prevWCol:', prevWCol !== null ? colLetter(prevWCol) : 'none');
-        break;
+  var wCol = null;
+  var matchedIdx = -1;
+  // 1) exact match (try neighbouring years too)
+  for (var k = 0; k < blockList.length && wCol === null; k++) {
+    for (var dy = 0; dy >= -1 && wCol === null; dy--) {
+      for (var dy2 = 0; dy2 <= 1; dy2++) {
+        const yr = selDate.getFullYear() + (dy !== 0 ? dy : dy2);
+        const r = rangeFor(blockList[k], yr);
+        if (selDate >= r.st && selDate <= r.en) { wCol = blockList[k].col; matchedIdx = k; break; }
       }
     }
-    if (wCol !== null) break;
+  }
+  // 2) no exact match: use the most recent week that started on/before the selected date
+  if (wCol === null) {
+    var best = -1, bestTime = -Infinity;
+    for (var k = 0; k < blockList.length; k++) {
+      const t = rangeFor(blockList[k], selDate.getFullYear()).st.getTime();
+      if (t <= selDate.getTime() && t > bestTime) { bestTime = t; best = k; }
+    }
+    if (best >= 0) { wCol = blockList[best].col; matchedIdx = best; }
+  }
+  if (wCol === null) {
+    console.log('No week headers found; falling back to column H');
+    wCol = 7;
+  } else {
+    console.log('Week matched:', blockList[matchedIdx].label, 'wCol:', colLetter(wCol));
   }
 
-  // Fallback: if no date range matched, use last populated week column
-  if (wCol === null) {
-    console.log('No date range matched selected date, using column H as fallback');
-    wCol = 7;
-    prevWCol = null;
-  }
+  // Earlier week columns, nearest first (used to find the most recent previous entry)
+  var prevCols = [];
+  for (var c2 = wCol - 3; c2 >= 7; c2 -= 3) prevCols.push(c2);
+  console.log('Previous-week columns to check:', prevCols.map(colLetter).join(', ') || 'none');
 
   var inSection = false;
   const exercises = [];
@@ -1510,7 +1579,8 @@ async function loadWorkout(token, sessionName) {
     if (/upper|lower|full.?body/i.test(cellA) && cellA !== sessionName) break;
     if (cellA === 'Exercise') continue;
 
-    const prev = prevWCol !== null ? (row[prevWCol] || '').toString().trim() : '';
+    var prev = '';
+    for (var pi = 0; pi < prevCols.length && !prev; pi++) prev = (row[prevCols[pi]] || '').toString().trim();
 
     exercises.push({
       name: cellA,
